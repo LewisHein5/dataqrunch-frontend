@@ -1,6 +1,6 @@
 /** @type {import('./$types').PageLoad} */
 import {createChannel, createClient} from 'nice-grpc-web';
-import {type DataQrunchServiceClient, DataQrunchServiceDefinition, type DatasetsList} from "$lib/dataqrunch";
+import {type DataQrunchServiceClient, DataQrunchServiceDefinition} from "$lib/dataqrunch";
 
 
 export async function load({ params }) {

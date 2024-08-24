@@ -4,7 +4,7 @@
     export let data;
 
     import {Drawer, Button, CloseButton, NavHamburger, List, Li} from 'flowbite-svelte';
-    import { InfoCircleSolid, ArrowRightOutline } from 'flowbite-svelte-icons';
+    import { InfoCircleSolid } from 'flowbite-svelte-icons';
     import { sineIn } from 'svelte/easing';
     let hidden1 = false;
     let transitionParams = {
