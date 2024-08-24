@@ -30,7 +30,7 @@
         </List>
         <List tag="ul" class="space-y-1 text-gray-500 dark:text-gray-400" list="none">
             {#each group.datasets as dataset}
-                <Li icon><FileChartBarOutline/>{dataset.name}</Li>
+                <Li icon><FileChartBarOutline/><a href="/datasets/{dataset.id?.id}">{dataset.name}</a></Li>
             {/each}
         </List>
         <ul class="dataset-list">
