@@ -13,6 +13,7 @@
         {:else}
             <FolderOutline/>    
         {/if}
+        <!--TODO refactor into a group name component-->
         {group.name}
         <div>
             <Badge rounded color="pink">Subgroups {group.subgroups.length}</Badge>
@@ -28,6 +29,7 @@
                 </Li>
             {/each}
         </List>
+        <!--TODO: Refactor into datasets list component-->
         <List tag="ul" class="space-y-1 text-gray-500 dark:text-gray-400" list="none">
             {#each group.datasets as dataset}
                 <Li icon><FileChartBarOutline/><a href="/datasets/{dataset.id?.id}">{dataset.name}</a></Li>
