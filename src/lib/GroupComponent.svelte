@@ -20,34 +20,33 @@
 
 <style>
     .group-container {
-        margin: 20px;
-        padding: 10px;
-        border: 1px solid #ccc;
-        border-radius: 5px;
+        margin-left: 20px;
     }
 
     .group-name {
-        font-size: 1.5rem;
+        font-size: 1rem;
+        font-weight: normal;
+        margin-bottom: 5px;
+        cursor: pointer;
+    }
+
+    .dataset-list, .subgroups-list {
+        list-style-type: none;
+        padding-left: 20px;
+        border-left: 1px solid #ccc;
+        margin-left: 10px;
+    }
+
+    .dataset-item, .subgroups-item {
+        padding: 2px 0;
+    }
+
+    .subgroups-item .group-container {
+        margin-left: 0;
+    }
+
+    .subgroups-item .group-name {
         font-weight: bold;
-        margin-bottom: 10px;
-    }
-
-    .dataset-list {
-        list-style-type: none;
-        padding-left: 0;
-    }
-    
-    .dataset-item {
-        padding: 5px 0;
-    }
-
-    .subgroups-list {
-        list-style-type: none;
-        padding-left: 0;
-    }
-    
-    .subgroups-item{
-        padding: 5px 0;
     }
 </style>
 
