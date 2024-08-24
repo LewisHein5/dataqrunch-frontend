@@ -2,31 +2,43 @@
     import type {Group} from "$lib/dataqrunch";
     export let group: Group;
     export let expanded: boolean;
-    import Icon from "@iconify/svelte";  
+    import {Badge, Indicator, Li, List} from "flowbite-svelte";
+    import {FileChartBarOutline, FolderOpenOutline, FolderOutline} from "flowbite-svelte-icons";  
 </script>
 
 <div class="group-container">
     <div class="group-name" on:click={() => {expanded = !expanded}}>
         {#if expanded}
-            <Icon icon="ph:folder-open-bold"/>
+            <FolderOpenOutline/>
         {:else}
-            <Icon icon="ph:folder-bold" />    
+            <FolderOutline/>    
         {/if}
         {group.name}
+        <div>
+            <Badge rounded color="pink">Subgroups {group.subgroups.length}</Badge>
+            <Badge rounded coler="purple">Datasets {group.datasets.length}</Badge>
+        </div>
+        
     </div>
     {#if expanded}
-        <ul class="subgroups-list">
+        <List tag="ul" class="space-y-1 text-gray-500 dark:text-gray-400" list="none">
             {#each group.subgroups as subgroup}
-                <li class="subgroups-item"><svelte:self group="{subgroup}" expanded="{false}"></svelte:self></li>
+                <Li>
+                    <svelte:self group="{subgroup}" expanded="{false}"></svelte:self>
+                </Li>
             {/each}
-        </ul>
-        <ul class="dataset-list">
+        </List>
+        <List tag="ul" class="space-y-1 text-gray-500 dark:text-gray-400" list="none">
             {#each group.datasets as dataset}
-                <li class="dataset-item"><Icon icon="ph:file-bold" />{dataset.name}</li>
+                <Li icon><FileChartBarOutline/>{dataset.name}</Li>
             {/each}
+        </List>
+        <ul class="dataset-list">
+            
         </ul>
     {/if}
 </div>
+
 
 <style>
     .group-container {
@@ -40,16 +52,12 @@
         cursor: pointer;
     }
 
-    .dataset-list, .subgroups-list {
+    .dataset-list {
         list-style-type: none;
         padding-left: min(10px, 20%);
         border-left: 1px solid #ccc;
         margin-left: 10px;
     }
-
-    .dataset-item, .subgroups-item {
-        padding: 2px 0;
-        list-style-type: none;
-    }
+    
 </style>
 
