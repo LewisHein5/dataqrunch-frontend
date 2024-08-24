@@ -1,11 +1,11 @@
 <script lang="ts">
     import type {Group} from "$lib/dataqrunch";
-
+    import IconAccountBox from '~icons/mdi/account-box'
     export let group: Group;
 </script>
 
 <div class="group-container">
-    <div class="group-name">{group.name}</div>
+    <div class="group-name"><IconAccountBox/>{group.name}</div>
     <ul class="subgroups-list">
         {#each group.subgroups as subgroup}
             <li class="subgroups-item"><svelte:self group="{subgroup}"></svelte:self></li>
