@@ -2,7 +2,7 @@
     import type {Group} from "$lib/dataqrunch";
     export let group: Group;
     export let expanded: boolean;
-    import {Badge, Indicator, Li, List} from "flowbite-svelte";
+    import {Badge, Li, List} from "flowbite-svelte";
     import {FileChartBarOutline, FolderOpenOutline, FolderOutline} from "flowbite-svelte-icons";  
 </script>
 
