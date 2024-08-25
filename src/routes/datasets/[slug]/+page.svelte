@@ -1,6 +1,7 @@
 <script>
     import {
-        FloatingLabelInput, 
+        Breadcrumb, BreadcrumbItem,
+        FloatingLabelInput,
         Table,
         TableBody,
         TableBodyCell,
@@ -8,11 +9,13 @@
         TableHead,
         TableHeadCell
     } from "flowbite-svelte";
+    import {ChevronDoubleRightOutline, HomeOutline} from "flowbite-svelte-icons";
 
     /** @type {import('./$types').PageData} */
     export let data;
     let focus={x:-1, y:-1}
-    $: tableSize = {nCols: data.dataset.spec[0].columns.length, nRows: data.rows.rows.length}
+    $: spec = data.dataset.spec[0]
+    $: tableSize = {nCols: spec.columns.length, nRows: data.rows.rows.length}
     let rowsWithChanges = new Set()
     
     // For printable characters, if they are typed in the table then the row is changed
@@ -41,14 +44,31 @@
             focus = {x:0, y:focus.y+1}
         }
         else if (row === tableSize.nRows - 1){
-            let spec = data.dataset.spec[0];
             data.rows.rows = [...data.rows.rows, {datasetSpecVersion: spec.version, data: spec.columns.map((_)=>{return ""})}]
             focus = {x:0, y:focus.y+1}
         } 
     }
 </script>
 
-<h1>{data.dataset.name}</h1>
+<Breadcrumb aria-label="Solid background breadcrumb example" class="bg-gray-50 py-3 px-5 dark:bg-gray-900">
+    <BreadcrumbItem href="/" home>
+        <svelte:fragment slot="icon">
+            <HomeOutline class="w-4 h-4 me-2" />
+        </svelte:fragment>Home
+    </BreadcrumbItem>
+    <BreadcrumbItem href="/groups">
+        <svelte:fragment slot="icon">
+            <ChevronDoubleRightOutline class="w-5 h-5 mx-2 dark:text-white" />
+        </svelte:fragment>
+        Datasets
+    </BreadcrumbItem>
+    <BreadcrumbItem>
+        <svelte:fragment slot="icon">
+            <ChevronDoubleRightOutline class="w-5 h-5 mx-2 dark:text-white" />
+        </svelte:fragment>
+        {data.dataset.name}
+    </BreadcrumbItem>
+</Breadcrumb>
 
 <Table striped hoverable>
     <TableHead>
@@ -64,7 +84,7 @@
                         <div on:click={(_) => {focus = {x: x,  y: y}}} aria-describedby="Row {y} Column {x}" on:keydown={handleKeyDownInTable}>
                         {#if focus.x === x && focus.y === y}
                             <FloatingLabelInput bind:value={row.data[x]} on:keypress={handleKeyPressInTable} color="blue" style="outlined" id="outlined_success" aria-describedby="outlined_success_help" name="outlined_success" type="text">
-                                {data.dataset.spec[0].columns[x].columnName} ({data.dataset.spec[0].columns[x].dataTypes})
+                                {spec.columns[x].columnName} ({spec.columns[x].dataTypes})
                             </FloatingLabelInput>
                         {:else}
                             {cell}
