@@ -12,13 +12,19 @@
     /** @type {import('./$types').PageData} */
     export let data;
     let focus={x:-1, y:-1}
-    let tableSize = {nCols: data.dataset.spec[0].columns.length, nRows: data.rows.rows.length}
+    $: tableSize = {nCols: data.dataset.spec[0].columns.length, nRows: data.rows.rows.length}
+    let rowsWithChanges = new Set()
     
-    function handleKeyPressInTable(e){
+    // For printable characters, if they are typed in the table then the row is changed
+    function handleKeyPressInTable(_){
+        rowsWithChanges = rowsWithChanges.add(focus.y)
+    }
+    
+    function handleKeyDownInTable(e){
         if (e.keyCode === 9) {
             handleTab(focus.y, focus.x)
         } 
-        if (e.keyCode === 13)
+        else if (e.keyCode === 13)
         {
             handleEnter(focus.y, focus.x)
         }
@@ -55,9 +61,9 @@
             <TableBodyRow>
                 {#each row.data as cell, x}
                     <TableBodyCell>
-                        <div on:click={(_) => {focus = {x: x,  y: y}}} aria-describedby="Row {y} Column {x}" on:keydown={handleKeyPressInTable}>
+                        <div on:click={(_) => {focus = {x: x,  y: y}}} aria-describedby="Row {y} Column {x}" on:keydown={handleKeyDownInTable}>
                         {#if focus.x === x && focus.y === y}
-                            <FloatingLabelInput bind:value={row.data[x]} color="blue" style="outlined" id="outlined_success" aria-describedby="outlined_success_help" name="outlined_success" type="text">
+                            <FloatingLabelInput bind:value={row.data[x]} on:keypress={handleKeyPressInTable} color="blue" style="outlined" id="outlined_success" aria-describedby="outlined_success_help" name="outlined_success" type="text">
                                 {data.dataset.spec[0].columns[x].columnName} ({data.dataset.spec[0].columns[x].dataTypes})
                             </FloatingLabelInput>
                         {:else}
