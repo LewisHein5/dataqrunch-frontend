@@ -14,6 +14,9 @@ export async function load({ params }) {
     let dataset = await client.getDataset({id: id});
     let info = await client.getDatasetInfo({id: id})
     let rows = await client.getDatasetRows({id: {id: id}, rowStart: 0, nRows: info.nRows})
+    console.log(rows);
     
     return {dataset: dataset, rows: rows}
 }
+
+export const ssr=false;

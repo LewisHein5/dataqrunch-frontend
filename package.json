@@ -29,6 +29,7 @@
 	},
 	"type": "module",
 	"dependencies": {
+		"@revolist/svelte-datagrid": "^4.9.18",
 		"long": "^5.2.3",
 		"nice-grpc-web": "^3.3.4",
 		"protobufjs": "^7.4.0",
