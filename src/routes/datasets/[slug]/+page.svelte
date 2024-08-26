@@ -14,8 +14,8 @@
     import {RevoGrid} from '@revolist/svelte-datagrid';
 
     // This part to makesure revogrid component is loaded and ready
-    import {defineCustomElements, type ColumnRegular} from '@revolist/revogrid/loader';
-    import {ColumnSpecModel, type DatasetRow, DatasetSpec} from "$lib/dataqrunch";
+    import {defineCustomElements} from '@revolist/revogrid/loader';
+    import {type DatasetRow, DatasetSpec} from "$lib/dataqrunch";
 
     defineCustomElements();
 
@@ -52,10 +52,4 @@
     </BreadcrumbItem>
 </Breadcrumb>
 
-<div>
-    {#each columns as col}
-        {col.prop}
-    {/each}
-    {console.log(data.rows)}
-</div>
 <RevoGrid {source} {columns} rowHeaders="{true}"></RevoGrid>
