@@ -78,14 +78,14 @@ export interface DatasetInfo {
 }
 
 export interface DatasetRow {
-  datasetSpecVersion: OptionalUInt64 | undefined;
+  datasetSpecVersion: number;
   version: string;
   data: string[];
-  rowNum: OptionalUInt64 | undefined;
+  rowNum: number;
 }
 
 /** We need this to prevent the assignment of 0 as a default value when the row_num is not given. Otherwise the client has to calculate the row number every time a row is inserted */
-export interface OptionalUInt64 {
+export interface OptionalRowNum {
   rowNum: number;
 }
 
@@ -101,7 +101,8 @@ export interface DatasetRowsRequest {
 
 export interface DatasetRowUploadRequest {
   id: DatasetIdModel | undefined;
-  row: DatasetRow | undefined;
+  data: string[];
+  rowNum: OptionalRowNum | undefined;
 }
 
 export interface Group {
@@ -782,13 +783,13 @@ export const DatasetInfo = {
 };
 
 function createBaseDatasetRow(): DatasetRow {
-  return { datasetSpecVersion: undefined, version: "", data: [], rowNum: undefined };
+  return { datasetSpecVersion: 0, version: "", data: [], rowNum: 0 };
 }
 
 export const DatasetRow = {
   encode(message: DatasetRow, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
-    if (message.datasetSpecVersion !== undefined) {
-      OptionalUInt64.encode(message.datasetSpecVersion, writer.uint32(10).fork()).join();
+    if (message.datasetSpecVersion !== 0) {
+      writer.uint32(8).uint64(message.datasetSpecVersion);
     }
     if (message.version !== "") {
       writer.uint32(18).string(message.version);
@@ -796,8 +797,8 @@ export const DatasetRow = {
     for (const v of message.data) {
       writer.uint32(26).string(v!);
     }
-    if (message.rowNum !== undefined) {
-      OptionalUInt64.encode(message.rowNum, writer.uint32(34).fork()).join();
+    if (message.rowNum !== 0) {
+      writer.uint32(32).uint64(message.rowNum);
     }
     return writer;
   },
@@ -810,11 +811,11 @@ export const DatasetRow = {
       const tag = reader.uint32();
       switch (tag >>> 3) {
         case 1:
-          if (tag !== 10) {
+          if (tag !== 8) {
             break;
           }
 
-          message.datasetSpecVersion = OptionalUInt64.decode(reader, reader.uint32());
+          message.datasetSpecVersion = longToNumber(reader.uint64());
           continue;
         case 2:
           if (tag !== 18) {
@@ -831,11 +832,11 @@ export const DatasetRow = {
           message.data.push(reader.string());
           continue;
         case 4:
-          if (tag !== 34) {
+          if (tag !== 32) {
             break;
           }
 
-          message.rowNum = OptionalUInt64.decode(reader, reader.uint32());
+          message.rowNum = longToNumber(reader.uint64());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -851,34 +852,30 @@ export const DatasetRow = {
   },
   fromPartial(object: DeepPartial<DatasetRow>): DatasetRow {
     const message = createBaseDatasetRow();
-    message.datasetSpecVersion = (object.datasetSpecVersion !== undefined && object.datasetSpecVersion !== null)
-      ? OptionalUInt64.fromPartial(object.datasetSpecVersion)
-      : undefined;
+    message.datasetSpecVersion = object.datasetSpecVersion ?? 0;
     message.version = object.version ?? "";
     message.data = object.data?.map((e) => e) || [];
-    message.rowNum = (object.rowNum !== undefined && object.rowNum !== null)
-      ? OptionalUInt64.fromPartial(object.rowNum)
-      : undefined;
+    message.rowNum = object.rowNum ?? 0;
     return message;
   },
 };
 
-function createBaseOptionalUInt64(): OptionalUInt64 {
+function createBaseOptionalRowNum(): OptionalRowNum {
   return { rowNum: 0 };
 }
 
-export const OptionalUInt64 = {
-  encode(message: OptionalUInt64, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
+export const OptionalRowNum = {
+  encode(message: OptionalRowNum, writer: BinaryWriter = new BinaryWriter()): BinaryWriter {
     if (message.rowNum !== 0) {
       writer.uint32(8).uint64(message.rowNum);
     }
     return writer;
   },
 
-  decode(input: BinaryReader | Uint8Array, length?: number): OptionalUInt64 {
+  decode(input: BinaryReader | Uint8Array, length?: number): OptionalRowNum {
     const reader = input instanceof BinaryReader ? input : new BinaryReader(input);
     let end = length === undefined ? reader.len : reader.pos + length;
-    const message = createBaseOptionalUInt64();
+    const message = createBaseOptionalRowNum();
     while (reader.pos < end) {
       const tag = reader.uint32();
       switch (tag >>> 3) {
@@ -898,11 +895,11 @@ export const OptionalUInt64 = {
     return message;
   },
 
-  create(base?: DeepPartial<OptionalUInt64>): OptionalUInt64 {
-    return OptionalUInt64.fromPartial(base ?? {});
+  create(base?: DeepPartial<OptionalRowNum>): OptionalRowNum {
+    return OptionalRowNum.fromPartial(base ?? {});
   },
-  fromPartial(object: DeepPartial<OptionalUInt64>): OptionalUInt64 {
-    const message = createBaseOptionalUInt64();
+  fromPartial(object: DeepPartial<OptionalRowNum>): OptionalRowNum {
+    const message = createBaseOptionalRowNum();
     message.rowNum = object.rowNum ?? 0;
     return message;
   },
@@ -1021,7 +1018,7 @@ export const DatasetRowsRequest = {
 };
 
 function createBaseDatasetRowUploadRequest(): DatasetRowUploadRequest {
-  return { id: undefined, row: undefined };
+  return { id: undefined, data: [], rowNum: undefined };
 }
 
 export const DatasetRowUploadRequest = {
@@ -1029,8 +1026,11 @@ export const DatasetRowUploadRequest = {
     if (message.id !== undefined) {
       DatasetIdModel.encode(message.id, writer.uint32(10).fork()).join();
     }
-    if (message.row !== undefined) {
-      DatasetRow.encode(message.row, writer.uint32(18).fork()).join();
+    for (const v of message.data) {
+      writer.uint32(18).string(v!);
+    }
+    if (message.rowNum !== undefined) {
+      OptionalRowNum.encode(message.rowNum, writer.uint32(26).fork()).join();
     }
     return writer;
   },
@@ -1054,7 +1054,14 @@ export const DatasetRowUploadRequest = {
             break;
           }
 
-          message.row = DatasetRow.decode(reader, reader.uint32());
+          message.data.push(reader.string());
+          continue;
+        case 3:
+          if (tag !== 26) {
+            break;
+          }
+
+          message.rowNum = OptionalRowNum.decode(reader, reader.uint32());
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -1071,7 +1078,10 @@ export const DatasetRowUploadRequest = {
   fromPartial(object: DeepPartial<DatasetRowUploadRequest>): DatasetRowUploadRequest {
     const message = createBaseDatasetRowUploadRequest();
     message.id = (object.id !== undefined && object.id !== null) ? DatasetIdModel.fromPartial(object.id) : undefined;
-    message.row = (object.row !== undefined && object.row !== null) ? DatasetRow.fromPartial(object.row) : undefined;
+    message.data = object.data?.map((e) => e) || [];
+    message.rowNum = (object.rowNum !== undefined && object.rowNum !== null)
+      ? OptionalRowNum.fromPartial(object.rowNum)
+      : undefined;
     return message;
   },
 };
@@ -1531,8 +1541,8 @@ export const DataQrunchServiceDefinition = {
       options: {},
     },
     /** Done */
-    addRows: {
-      name: "AddRows",
+    addOrModifyRow: {
+      name: "AddOrModifyRow",
       requestType: DatasetRowUploadRequest,
       requestStream: false,
       responseType: DatasetRow,
@@ -1639,7 +1649,10 @@ export interface DataQrunchServiceImplementation<CallContextExt = {}> {
   /** Done */
   listDatasets(request: ListDatasetsRequest, context: CallContext & CallContextExt): Promise<DeepPartial<DatasetsList>>;
   /** Done */
-  addRows(request: DatasetRowUploadRequest, context: CallContext & CallContextExt): Promise<DeepPartial<DatasetRow>>;
+  addOrModifyRow(
+    request: DatasetRowUploadRequest,
+    context: CallContext & CallContextExt,
+  ): Promise<DeepPartial<DatasetRow>>;
   /** Done */
   createGroup(request: CreateGroupRequest, context: CallContext & CallContextExt): Promise<DeepPartial<Group>>;
   /** Done */
@@ -1691,7 +1704,10 @@ export interface DataQrunchServiceClient<CallOptionsExt = {}> {
     options?: CallOptions & CallOptionsExt,
   ): Promise<DatasetsList>;
   /** Done */
-  addRows(request: DeepPartial<DatasetRowUploadRequest>, options?: CallOptions & CallOptionsExt): Promise<DatasetRow>;
+  addOrModifyRow(
+    request: DeepPartial<DatasetRowUploadRequest>,
+    options?: CallOptions & CallOptionsExt,
+  ): Promise<DatasetRow>;
   /** Done */
   createGroup(request: DeepPartial<CreateGroupRequest>, options?: CallOptions & CallOptionsExt): Promise<Group>;
   /** Done */
