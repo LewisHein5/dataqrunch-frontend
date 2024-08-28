@@ -9,7 +9,7 @@ service DataQrunchService {
   rpc CreateDataset(CreateDatasetRequest) returns (Dataset); //Done
   rpc ModifyDataset(Dataset) returns (Dataset); //Done
   rpc ListDatasets(ListDatasetsRequest) returns (DatasetsList); //Done
-  rpc AddRows(DatasetRowUploadRequest) returns (DatasetRow); //Done
+  rpc AddOrModifyRow(DatasetRowUploadRequest) returns (DatasetRow); //Done
 
   rpc CreateGroup(CreateGroupRequest) returns (Group); //Done
   rpc AddGroupToGroup(ModifyGroupParentGroupRequest) returns (Group); //Done
@@ -82,13 +82,13 @@ message DatasetInfo {
 }
 
 message DatasetRow {
-  OptionalUInt64 dataset_spec_version = 1;
+  uint64 dataset_spec_version = 1;
   string version = 2;
   repeated string data = 3;
-  OptionalUInt64 row_num = 4;
+  uint64 row_num = 4;
 }
 
-message OptionalUInt64 { //We need this to prevent the assignment of 0 as a default value when the row_num is not given. Otherwise the client has to calculate the row number every time a row is inserted
+message OptionalRowNum { //We need this to prevent the assignment of 0 as a default value when the row_num is not given. Otherwise the client has to calculate the row number every time a row is inserted
   uint64 row_num = 1;
 }
 
@@ -104,7 +104,8 @@ message DatasetRowsRequest {
 
 message DatasetRowUploadRequest {
   DatasetIdModel id = 1;
-  DatasetRow row = 2;
+  repeated string data = 2;
+  OptionalRowNum row_num = 3;
 }
 
 message Group{
