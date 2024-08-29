@@ -5,7 +5,7 @@
 
     import {List, Li} from 'flowbite-svelte';
         import { sineIn } from 'svelte/easing';
-    import DatasetComponent from "../../components/DatasetComponent.svelte";
+    import DatasetComponent from "../../components/DatasetNameComponent.svelte";
     let hidden1 = false;
     let transitionParams = {
         x: -320,

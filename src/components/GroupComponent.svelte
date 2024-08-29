@@ -4,7 +4,7 @@
     export let expanded: boolean;
     import {Badge, Li, List} from "flowbite-svelte";
     import {FolderOpenOutline, FolderOutline} from "flowbite-svelte-icons";
-    import DatasetComponent from "./DatasetComponent.svelte";  
+    import DatasetComponent from "./DatasetNameComponent.svelte";  
 </script>
 
 <div class="group-container">
