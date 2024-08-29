@@ -15,7 +15,7 @@
 
     // This part to make sure the  revogrid component is loaded and ready
     import {defineCustomElements} from '@revolist/revogrid/loader';
-    import {type DatasetRow, DatasetSpec, type OptionalUInt64} from "$lib/dataqrunch";
+    import {type DatasetRow, DatasetSpec} from "$lib/dataqrunch";
     import {DataQrunchClientFactory} from "$lib/client";
 
     defineCustomElements();
@@ -31,7 +31,7 @@
     
     function blankRow(){
         let blankRow = {};
-        spec.columns.forEach((col, index) => {
+        spec.columns.forEach((col) => {
             blankRow[col.columnName] = "";
         });
         return blankRow;
@@ -50,19 +50,17 @@
         let rowIndex = e.detail.rowIndex;
         let colNames = spec.columns.map((x) => x.columnName);
         let rowDataModel = source[rowIndex];
-        let rowData = []
+        let rowData: string[] = []
         for (let colname of colNames){
             rowData.push(rowDataModel[colname] ?? "")
         }
-        //FIXME: Race condition if spec changes. Get an immutable copy of spec
-        let specVersion: OptionalUInt64 = {rowNum: spec.version}
+        // TODO: Race condition if spec changes. Get an immutable copy of spec
+        let versionNumber = spec.version
+        let nRows = tableSize.nRows;
         
-        let row: DatasetRow = {
-            datasetSpecVersion: specVersion,
-            version:
-        }
         let client = DataQrunchClientFactory.getClientInstance()
-        
+        let result = await client.saveRow(data.dataset.id.id, nRows, rowData, versionNumber);
+        console.log(result);
     }        
 </script>
 

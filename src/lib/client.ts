@@ -28,16 +28,33 @@ class Client{
         return rows.rows
     }
     
-    public async saveDatasetRow(id: string,  row: DatasetRow): Promise<DatasetRow>{
+    public async saveRow(id: string, row_number: number, row_data: string[], dataset_spec_version: number): Promise<DatasetRow>{
         let request: DatasetRowUploadRequest = {
             id: this.createIdModel(id),
-            row: row
+            datasetSpecVersion: dataset_spec_version,
+            data: row_data,
+            rowNum: {rowNum: row_number} //FIXME: Should only send this if editing a row
         };
-        return await this.client.addRows(request);
+        return await this.client.addOrModifyRow(request);
     }
     
+    public async listGroups(parent_group_id: string|undefined){
+        let group_id = this.computeIdModelFromString(parent_group_id)
+        return await this.client.listGroups(group_id);
+    }
+
+    public async listDatasets(parent_group_id: string|undefined){
+        let group_id = this.computeIdModelFromString(parent_group_id)
+        return await this.client.listDatasets(group_id)
+    }
+
     private createIdModel(id: string): DatasetIdModel {
         return {id: id}
+    }
+
+
+    private computeIdModelFromString(parent_group_id: string | undefined) {
+        return parent_group_id === undefined ? {} : {group: this.createIdModel(parent_group_id)};
     }
 }
 

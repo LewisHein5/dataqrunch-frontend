@@ -3,7 +3,8 @@
     export let group: Group;
     export let expanded: boolean;
     import {Badge, Li, List} from "flowbite-svelte";
-    import {FileChartBarOutline, FolderOpenOutline, FolderOutline} from "flowbite-svelte-icons";  
+    import {FolderOpenOutline, FolderOutline} from "flowbite-svelte-icons";
+    import DatasetComponent from "./DatasetComponent.svelte";  
 </script>
 
 <div class="group-container">
@@ -32,12 +33,9 @@
         <!--TODO: Refactor into datasets list component-->
         <List tag="ul" class="space-y-1 text-gray-500 dark:text-gray-400" list="none">
             {#each group.datasets as dataset}
-                <Li icon><FileChartBarOutline/><a href="/datasets/{dataset.id?.id}">{dataset.name}</a></Li>
+                <Li icon><DatasetComponent {dataset}/></Li>
             {/each}
         </List>
-        <ul class="dataset-list">
-            
-        </ul>
     {/if}
 </div>
 
@@ -52,13 +50,6 @@
         font-weight: normal;
         margin-bottom: 5px;
         cursor: pointer;
-    }
-
-    .dataset-list {
-        list-style-type: none;
-        padding-left: min(10px, 20%);
-        border-left: 1px solid #ccc;
-        margin-left: 10px;
     }
     
 </style>

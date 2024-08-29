@@ -5,6 +5,7 @@
 
     import {List, Li} from 'flowbite-svelte';
         import { sineIn } from 'svelte/easing';
+    import DatasetComponent from "../../components/DatasetComponent.svelte";
     let hidden1 = false;
     let transitionParams = {
         x: -320,
@@ -17,6 +18,11 @@
     {#each data.groups as group}
         <Li>
             <GroupComponent group="{group}" expanded="{false}"></GroupComponent>
+        </Li>
+    {/each}
+    {#each data.datasets as dataset}
+        <Li>
+            <DatasetComponent {dataset}/>
         </Li>
     {/each}
 </List>

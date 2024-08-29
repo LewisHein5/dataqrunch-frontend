@@ -101,6 +101,7 @@ export interface DatasetRowsRequest {
 
 export interface DatasetRowUploadRequest {
   id: DatasetIdModel | undefined;
+  datasetSpecVersion: number;
   data: string[];
   rowNum: OptionalRowNum | undefined;
 }
@@ -1018,7 +1019,7 @@ export const DatasetRowsRequest = {
 };
 
 function createBaseDatasetRowUploadRequest(): DatasetRowUploadRequest {
-  return { id: undefined, data: [], rowNum: undefined };
+  return { id: undefined, datasetSpecVersion: 0, data: [], rowNum: undefined };
 }
 
 export const DatasetRowUploadRequest = {
@@ -1026,11 +1027,14 @@ export const DatasetRowUploadRequest = {
     if (message.id !== undefined) {
       DatasetIdModel.encode(message.id, writer.uint32(10).fork()).join();
     }
+    if (message.datasetSpecVersion !== 0) {
+      writer.uint32(16).uint64(message.datasetSpecVersion);
+    }
     for (const v of message.data) {
-      writer.uint32(18).string(v!);
+      writer.uint32(26).string(v!);
     }
     if (message.rowNum !== undefined) {
-      OptionalRowNum.encode(message.rowNum, writer.uint32(26).fork()).join();
+      OptionalRowNum.encode(message.rowNum, writer.uint32(34).fork()).join();
     }
     return writer;
   },
@@ -1050,14 +1054,21 @@ export const DatasetRowUploadRequest = {
           message.id = DatasetIdModel.decode(reader, reader.uint32());
           continue;
         case 2:
-          if (tag !== 18) {
+          if (tag !== 16) {
+            break;
+          }
+
+          message.datasetSpecVersion = longToNumber(reader.uint64());
+          continue;
+        case 3:
+          if (tag !== 26) {
             break;
           }
 
           message.data.push(reader.string());
           continue;
-        case 3:
-          if (tag !== 26) {
+        case 4:
+          if (tag !== 34) {
             break;
           }
 
@@ -1078,6 +1089,7 @@ export const DatasetRowUploadRequest = {
   fromPartial(object: DeepPartial<DatasetRowUploadRequest>): DatasetRowUploadRequest {
     const message = createBaseDatasetRowUploadRequest();
     message.id = (object.id !== undefined && object.id !== null) ? DatasetIdModel.fromPartial(object.id) : undefined;
+    message.datasetSpecVersion = object.datasetSpecVersion ?? 0;
     message.data = object.data?.map((e) => e) || [];
     message.rowNum = (object.rowNum !== undefined && object.rowNum !== null)
       ? OptionalRowNum.fromPartial(object.rowNum)

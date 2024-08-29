@@ -104,8 +104,9 @@ message DatasetRowsRequest {
 
 message DatasetRowUploadRequest {
   DatasetIdModel id = 1;
-  repeated string data = 2;
-  OptionalRowNum row_num = 3;
+  uint64 dataset_spec_version = 2;
+  repeated string data = 3;
+  OptionalRowNum row_num = 4;
 }
 
 message Group{

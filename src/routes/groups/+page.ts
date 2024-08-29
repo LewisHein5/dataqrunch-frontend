@@ -1,14 +1,11 @@
 /** @type {import('./$types').PageLoad} */
-import {createChannel, createClient} from 'nice-grpc-web';
-import {type DataQrunchServiceClient, DataQrunchServiceDefinition} from "$lib/dataqrunch";
+import {DataQrunchClientFactory} from "$lib/client";
 
-
+//todo: use a slug
 export async function load({ params }) {
-    const channel = createChannel('http://localhost:10000');
-
-    const client: DataQrunchServiceClient = createClient(
-        DataQrunchServiceDefinition,
-        channel,
-    );
-    return await client.listGroups({group: undefined});
+    let client = DataQrunchClientFactory.getClientInstance();
+    let groups = await client.listGroups(undefined);
+    let datasets = await client.listDatasets(undefined)
+    
+    return {groups: groups.groups,  datasets: datasets.datasets}
 }
