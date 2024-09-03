@@ -3,7 +3,7 @@ import {
     type DataQrunchServiceClient,
     DataQrunchServiceDefinition,
     type Dataset, type DatasetIdModel,
-    type DatasetRow, DatasetRowUploadRequest
+    type DatasetRow, DatasetRowUploadRequest, type DatasetSpec
 } from "$lib/dataqrunch";
 /*
 To compile lib from proto file run from src/lib:
@@ -38,6 +38,10 @@ class Client{
         return await this.client.addOrModifyRow(request);
     }
     
+    public async saveDataset(dataset: Dataset): Promise<Dataset> {
+        return await this.client.modifyDataset(dataset)
+    }
+    
     public async listGroups(parent_group_id: string|undefined){
         let group_id = this.computeIdModelFromString(parent_group_id)
         return await this.client.listGroups(group_id);
@@ -46,6 +50,10 @@ class Client{
     public async listDatasets(parent_group_id: string|undefined){
         let group_id = this.computeIdModelFromString(parent_group_id)
         return await this.client.listDatasets(group_id)
+    }
+    
+    public async listDataTypes(): Promise<string[]> {
+        return (await this.client.listDataTypes({})).types
     }
 
     private createIdModel(id: string): DatasetIdModel {

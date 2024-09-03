@@ -1,25 +1,22 @@
 <script lang="ts">
     import {
-        Breadcrumb, BreadcrumbItem,
+        Breadcrumb, BreadcrumbItem, Toolbar, ToolbarButton, Tooltip,
     } from "flowbite-svelte";
-    import {ChevronDoubleRightOutline, HomeOutline} from "flowbite-svelte-icons";
-
-    /** @type {import('./$types').PageData} */
-    export let data;
-    let focus = {x: -1, y: -1}
-    $: spec = data.dataset.spec[data.dataset.spec.length - 1] as DatasetSpec;
-    $: tableSize = {nCols: spec.columns.length, nRows: data.rows.length}
-    let rowsWithChanges = new Set()
+    import {ChevronDoubleRightOutline, GridPlusOutline, HomeOutline} from "flowbite-svelte-icons";
 
     import {RevoGrid, type RevoGridCustomEvent} from '@revolist/svelte-datagrid';
 
     // This part to make sure the  revogrid component is loaded and ready
     import {defineCustomElements} from '@revolist/revogrid/loader';
-    import {type DatasetRow, DatasetSpec} from "$lib/dataqrunch";
+    import {type Dataset, type DatasetRow, DatasetSpec} from "$lib/dataqrunch";
     import {DataQrunchClientFactory} from "$lib/client";
-
+    import NewColumnModalComponent from "../../../components/NewColumnModalComponent.svelte";
     defineCustomElements();
-
+    /** @type {import('./$types').PageData} */
+    
+    export let data: { dataset: Dataset, rows: DatasetRow[], types: string[] };
+    $: spec = data.dataset.spec[data.dataset.spec.length - 1] as DatasetSpec;
+    $: tableSize = {nCols: spec.columns.length, nRows: data.rows.length}
     $: columns = spec.columns.map((x) => {return {prop: x.columnName, name: x.columnName}})
     $: datasetRowObjects = data.rows.map((x:DatasetRow) => {
         let model = {}
@@ -28,24 +25,26 @@
         });
         return model;
     });
+
+    $: source = [...datasetRowObjects, blankRow()]
+    let showModal=false;
     
     function blankRow(){
         let blankRow = {};
         spec.columns.forEach((col) => {
             blankRow[col.columnName] = "";
         });
+
         return blankRow;
+
     }
-    
-    $: source = [...datasetRowObjects, blankRow()]
-    
     function onBeforeEdit(e: RevoGridCustomEvent<any>){
         //focus = {x: e.detail.columnIndex, y: e.detail.rowIndex};
         if (e.detail.rowIndex === source.length-1){
             source = [...source, blankRow()]
         }
+
     }
-    
     async function onAfterEdit(e:RevoGridCustomEvent<any>){
         let rowIndex = e.detail.rowIndex;
         let colNames = spec.columns.map((x) => x.columnName);
@@ -56,12 +55,23 @@
         }
         // TODO: Race condition if spec changes. Get an immutable copy of spec
         let versionNumber = spec.version
+
         let nRows = tableSize.nRows;
-        
         let client = DataQrunchClientFactory.getClientInstance()
         let result = await client.saveRow(data.dataset.id.id, nRows, rowData, versionNumber);
         console.log(result);
-    }        
+
+    }
+    
+    async function addColumn(event: CustomEvent<{columnName: string, dataType: number}>){
+        let newSpec = spec;
+        console.log(event.detail.dataType)
+        newSpec.columns.push({columnName: event.detail.columnName, dataTypes: event.detail.dataType})
+        spec = newSpec;
+        let client = DataQrunchClientFactory.getClientInstance()
+        let dataset: Dataset = {spec: [spec], id: data.dataset.id, name: data.dataset.name}
+        await client.saveDataset(dataset)
+    }
 </script>
 
 <Breadcrumb aria-label="Solid background breadcrumb example" class="bg-gray-50 py-3 px-5 dark:bg-gray-900">
@@ -84,5 +94,9 @@
         {data.dataset.name}
     </BreadcrumbItem>
 </Breadcrumb>
-
+<Toolbar>
+    <ToolbarButton on:click={() => (showModal=true)} color="blue"><GridPlusOutline></GridPlusOutline></ToolbarButton>
+    <Tooltip>Add a new column</Tooltip>
+</Toolbar>
 <RevoGrid {source} {columns} on:beforeedit={onBeforeEdit} on:afteredit={onAfterEdit} rowHeaders=true></RevoGrid>
+<NewColumnModalComponent bind:open={showModal} on:accepted={addColumn}/>

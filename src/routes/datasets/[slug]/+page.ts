@@ -1,6 +1,4 @@
 /** @type {import('./$types').PageLoad} */
-import {createChannel, createClient} from 'nice-grpc-web';
-import {type DataQrunchServiceClient, DataQrunchServiceDefinition} from "$lib/dataqrunch";
 import {DataQrunchClientFactory} from "$lib/client";
 
 
@@ -9,9 +7,9 @@ export async function load({ params }) {
     let client = DataQrunchClientFactory.getClientInstance()
     let dataset = await client.getDataset(id);
     let rows = await client.getAllDatasetRows(id);
-    console.log(rows)
+    let types = await client.listDataTypes();
     
-    return {dataset: dataset, rows: rows}
+    return {dataset: dataset, rows: rows, types: types}
 }
 
 export const ssr=false;
