@@ -19,4 +19,4 @@ Thumbs.db
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
-/auth_config.ts
+/src/auth_config.ts
