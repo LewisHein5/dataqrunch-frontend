@@ -17,10 +17,9 @@ import {
     ChartPieSolid, EditOutline, FolderDuplicateSolid,
 } from "flowbite-svelte-icons";
 import {isAuthenticated, user} from "../store.js";
-import type {Auth0Client, PopupLoginOptions} from "@auth0/auth0-spa-js";
+import type {Auth0Client} from "@auth0/auth0-spa-js";
 import {onMount} from "svelte";
 import auth from "../authService";
-import type {Cookies} from "@sveltejs/kit";
 
 let auth0Client: Auth0Client;
 
@@ -117,6 +116,9 @@ function logout() {
     </aside>
     <main class="content">
         <slot></slot>
+        {#if $isAuthenticated}
+            <Button on:click={login}>Log in</Button>
+        {/if}
     </main>
 </div>
 
