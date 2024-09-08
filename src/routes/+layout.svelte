@@ -119,7 +119,7 @@ function logout() {
     </aside>
     <main class="content">
         <slot></slot>
-        {#if $isAuthenticated}
+        {#if !$isAuthenticated}
             <Button on:click={login}>Log in</Button>
         {/if}
     </main>
