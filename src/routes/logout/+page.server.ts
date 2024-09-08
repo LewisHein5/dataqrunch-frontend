@@ -1,4 +1,4 @@
 
-export async function load({ request, cookies }) {
+export async function load({ cookies }) {
     cookies.delete("jwt", {path: "/"})
 }

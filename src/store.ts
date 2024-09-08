@@ -1,4 +1,4 @@
-import {writable,  derived} from "svelte/store";
+import {writable} from "svelte/store";
 import {User} from "@auth0/auth0-spa-js";
 
 export const isAuthenticated = writable(false);

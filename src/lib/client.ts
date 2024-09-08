@@ -1,11 +1,10 @@
-import {type Channel, createChannel, createClient, type DefaultCallOptions, Metadata} from "nice-grpc-web";
+import {type Channel, createChannel, createClient, Metadata} from "nice-grpc-web";
 import {
     type DataQrunchServiceClient,
     DataQrunchServiceDefinition,
     type Dataset, type DatasetIdModel,
-    type DatasetRow, DatasetRowUploadRequest, type DatasetSpec
+    type DatasetRow, DatasetRowUploadRequest
 } from "$lib/dataqrunch";
-import auth from "../authService";
 import type {CallOptions} from "nice-grpc-common";
 /*
 To compile lib from proto file run from src/lib:
