@@ -45,6 +45,9 @@ function login() {
 }
 
 function logout() {
+    let r = new XMLHttpRequest()
+    r.open("GET", "/logout") //TODO: GET request with a side effect
+    r.send()
     auth.logout(auth0Client);
 }
 </script>
