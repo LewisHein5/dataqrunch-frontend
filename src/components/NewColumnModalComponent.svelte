@@ -2,10 +2,11 @@
     import {Button, FloatingLabelInput, Label, Modal, Select, Spinner} from "flowbite-svelte";
     import {createEventDispatcher} from "svelte";
     import {DataQrunchClientFactory} from "$lib/client";
+    import {apiKey} from "../store";
     export let open = false
     $: selected = -1
     $: colName = ""
-    let client = DataQrunchClientFactory.getClientInstance();
+    let client = new DataQrunchClientFactory($apiKey).getClientInstance();
     let dataTypes = getDataTypes();
 
     const dispatch = createEventDispatcher();
