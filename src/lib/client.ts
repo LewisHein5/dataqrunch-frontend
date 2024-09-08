@@ -18,7 +18,6 @@ class Client{
     private call_options: CallOptions;
     
     constructor(auth_token: string) {
-        console.log(auth_token)
         this.auth_token = auth_token
         //TODO: USe the auth everywhere
         this.call_options = {
