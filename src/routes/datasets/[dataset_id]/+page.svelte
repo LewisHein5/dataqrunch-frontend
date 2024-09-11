@@ -30,7 +30,6 @@
     $: source = [...datasetRowObjects, blankRow()]
     let showModal=false;
     //TODO: Should the load function return the client object?
-    let apiClient = new DataQrunchClientFactory($apiKey).getClientInstance()
     
     function blankRow(){
         let blankRow = {};
@@ -49,6 +48,10 @@
 
     }
     async function onAfterEdit(e:RevoGridCustomEvent<any>){
+        let apiClient = new DataQrunchClientFactory($apiKey).getClientInstance()
+        if (apiClient == undefined){
+            throw Error("Could not get API client")
+        }
         let rowIndex = e.detail.rowIndex;
         let colNames = spec.columns.map((x) => x.columnName);
         let rowDataModel = source[rowIndex];
@@ -65,12 +68,15 @@
 
     }
     
-    async function addColumn(event: CustomEvent<{columnName: string, dataType: number}>){
+    async function addColumn(event: CustomEvent<ColumnDef>){
         let newSpec = spec;
         console.log(event.detail.dataType)
         newSpec.columns.push({columnName: event.detail.columnName, dataTypes: event.detail.dataType})
         spec = newSpec;
         let client = new DataQrunchClientFactory($apiKey).getClientInstance()
+        if (client == undefined) {
+            throw Error("Could not create API client")
+        }
         let dataset: Dataset = {spec: [spec], id: data.dataset.id, name: data.dataset.name}
         await client.saveDataset(dataset)
     }

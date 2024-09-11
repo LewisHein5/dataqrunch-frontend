@@ -68,7 +68,7 @@ export interface RowConstraintModel {
 
 export interface ColumnSpecModel {
   columnName: string;
-  dataTypes: DataColumnType;
+  dataType: DataColumnType;
 }
 
 export interface DatasetInfo {
@@ -661,7 +661,7 @@ export const RowConstraintModel = {
 };
 
 function createBaseColumnSpecModel(): ColumnSpecModel {
-  return { columnName: "", dataTypes: 0 };
+  return { columnName: "", dataType: 0 };
 }
 
 export const ColumnSpecModel = {
@@ -669,8 +669,8 @@ export const ColumnSpecModel = {
     if (message.columnName !== "") {
       writer.uint32(10).string(message.columnName);
     }
-    if (message.dataTypes !== 0) {
-      writer.uint32(16).int32(message.dataTypes);
+    if (message.dataType !== 0) {
+      writer.uint32(16).int32(message.dataType);
     }
     return writer;
   },
@@ -694,7 +694,7 @@ export const ColumnSpecModel = {
             break;
           }
 
-          message.dataTypes = reader.int32() as any;
+          message.dataType = reader.int32() as any;
           continue;
       }
       if ((tag & 7) === 4 || tag === 0) {
@@ -711,7 +711,7 @@ export const ColumnSpecModel = {
   fromPartial(object: DeepPartial<ColumnSpecModel>): ColumnSpecModel {
     const message = createBaseColumnSpecModel();
     message.columnName = object.columnName ?? "";
-    message.dataTypes = object.dataTypes ?? 0;
+    message.dataType = object.dataType ?? 0;
     return message;
   },
 };

@@ -16,8 +16,10 @@ import {
     ArrowRightToBracketOutline,
     ChartPieSolid, EditOutline, FolderDuplicateSolid,
 } from "flowbite-svelte-icons";
-import {isAuthenticated, user} from "../store.js";
-import type {Auth0Client} from "@auth0/auth0-spa-js";
+import {apiKey, isAuthenticated, user} from "../store.js";
+import type {
+    Auth0Client
+} from "@auth0/auth0-spa-js";
 import {onMount} from "svelte";
 import auth from "../authService";
 
@@ -31,7 +33,20 @@ onMount(async ()=>{
         isAuthenticated.set(false);
         return;
     }
-    let token = await auth0Client.getTokenSilently();
+    /*let token = undefined
+    while (token === undefined){ //TODO FIXME infinite loop
+        try {
+            token = await auth0Client.getTokenSilently({authorizationParams: {audience: "localhost/gablorp/whyy"}})
+        }
+        catch (e){
+            token = await auth0Client.getTokenWithPopup({authorizationParams: {audience: "localhost/gablorp/whyy"}});
+        }
+    }*/
+    let options = {authorizationParams: {audience: "localhost/gablorp/whyy"}}
+    let token = await auth0Client.getTokenSilently(options); //TODO: FIXME
+    console.log("TOKEN")
+    console.log(token);
+    apiKey.set(token)
     let r = new XMLHttpRequest();
     //TODO: get requests should not have side effects
     r.open("GET", "/login-success")
@@ -41,7 +56,7 @@ onMount(async ()=>{
 });
 
 function login() {
-    auth.loginWithPopup(auth0Client, {})    
+    auth.loginWithPopup(auth0Client, {authorizationParams: {audience: "localhost/gablorp/whyy"}})    
 }
 
 function logout() {

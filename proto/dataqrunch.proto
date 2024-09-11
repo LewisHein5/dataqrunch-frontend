@@ -72,7 +72,7 @@ message RowConstraintModel{
 
 message ColumnSpecModel {
   string column_name = 1;
-  DataColumnType data_types = 2;
+  DataColumnType data_type = 2;
 }
 
 message DatasetInfo {

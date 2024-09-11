@@ -1,0 +1,1 @@
+type ColumnDef = {columnName: string, dataType: number};
