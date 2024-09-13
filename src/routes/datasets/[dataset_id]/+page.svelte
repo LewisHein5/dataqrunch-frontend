@@ -103,7 +103,7 @@
     </BreadcrumbItem>
 </Breadcrumb>
 <Toolbar>
-    <ToolbarButton on:click={() => (showModal=true)} color="blue"><GridPlusOutline></GridPlusOutline></ToolbarButton>
+    <ToolbarButton on:click={() => (showModal=true)} class="toolbar-button"><GridPlusOutline></GridPlusOutline> New Column</ToolbarButton>
     <Tooltip>Add a new column</Tooltip>
 </Toolbar>
 <RevoGrid {source} {columns} on:beforeedit={onBeforeEdit} on:afteredit={onAfterEdit} rowHeaders=true></RevoGrid>
