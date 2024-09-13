@@ -22,7 +22,7 @@
 </script>
 
 <Toolbar>
-    <ToolbarButton on:click={() => (showModal=true)} color="blue"><FileCirclePlusOutline/></ToolbarButton>
+    <ToolbarButton on:click={() => (showModal=true)} color="green" style="text-align: center"><FileCirclePlusOutline/>New dataset</ToolbarButton>
     <Tooltip>Add a new dataset</Tooltip>
 </Toolbar>
 <List tag="ul" class="space-y-1 text-gray-500 dark:text-gray-400" list="none">

@@ -26,6 +26,7 @@
         });
         return model;
     });
+    $: focusedCell = {col: -1, row: -1};
 
     $: source = [...datasetRowObjects, blankRow()]
     let showModal=false;
@@ -41,7 +42,8 @@
 
     }
     function onBeforeEdit(e: RevoGridCustomEvent<any>){
-        //focus = {x: e.detail.columnIndex, y: e.detail.rowIndex};
+        focusedCell = {col: e.detail.colIndex, row: e.detail.rowIndex};
+        console.log(focusedCell)
         if (e.detail.rowIndex === source.length-1){
             source = [...source, blankRow()]
         }
@@ -62,8 +64,7 @@
         // TODO: Race condition if spec changes. Get an immutable copy of spec
         let versionNumber = spec.version
 
-        let nRows = tableSize.nRows;
-        let result = await apiClient.saveRow(data.dataset.id.id, nRows, rowData, versionNumber);
+        let result = await apiClient.saveRow(data.dataset.id.id, focusedCell.row, rowData, versionNumber);
         console.log(result);
 
     }
@@ -71,7 +72,7 @@
     async function addColumn(event: CustomEvent<ColumnDef>){
         let newSpec = spec;
         console.log(event.detail.dataType)
-        newSpec.columns.push({columnName: event.detail.columnName, dataTypes: event.detail.dataType})
+        newSpec.columns.push({columnName: event.detail.columnName, dataType: event.detail.dataType})
         spec = newSpec;
         let client = new DataQrunchClientFactory($apiKey).getClientInstance()
         if (client == undefined) {
