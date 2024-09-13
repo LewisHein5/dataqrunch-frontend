@@ -1,10 +1,10 @@
 import {type Channel, createChannel, createClient, Metadata} from "nice-grpc-web";
 import {
-    type CreateDatasetRequest,
+    type CreateDatasetRequest, type CreateGroupRequest,
     type DataQrunchServiceClient,
     DataQrunchServiceDefinition,
     type Dataset, type DatasetIdModel,
-    type DatasetRow, DatasetRowUploadRequest
+    type DatasetRow, DatasetRowUploadRequest, type Group, type GroupIdModel
 } from "$lib/dataqrunch";
 import type {CallOptions} from "nice-grpc-common";
 import type {DatasetConstraint} from "$lib/models/DatasetConstraint";
@@ -13,7 +13,7 @@ import type {DatasetConstraint} from "$lib/models/DatasetConstraint";
 To compile lib from proto file run from src/lib:
 ../../node_modules/.bin/grpc_tools_node_protoc   --plugin=protoc-gen-ts_proto=../../node_modules/.bin/protoc-gen-ts_proto   --ts_proto_out=.   --ts_proto_opt=env=browser,outputServices=nice-grpc,outputServices=generic-definitions,outputJsonMethods=false,useExactTypes=false   --proto_path=../../proto   ../../proto/dataqrunch.proto
  */
-class Client{
+export class Client{
     private channel: Channel;
     private client: DataQrunchServiceClient
     private auth_token: string;
@@ -54,8 +54,7 @@ class Client{
         return await this.client.modifyDataset(dataset, this.call_options)
     }
     
-    //TODO: Groups
-    public async createDataset(create_info: {name: string, columns: ColumnDef[], constraints: DatasetConstraint[]}): Promise<Dataset> {
+    public async createDataset(create_info: {name: string, parent_group: GroupIdModel | undefined, columns: ColumnDef[], constraints: DatasetConstraint[]}): Promise<Dataset> {
         let request: CreateDatasetRequest = {
             name: create_info.name,
             spec: {
@@ -65,13 +64,31 @@ class Client{
             }
         }
         
+        if (create_info.parent_group !== undefined){
+            request.parent = create_info.parent_group
+        }
+        
         return await this.client.createDataset(request, this.call_options)
+    }
+    
+    public async createGroup(create_info: {name: string, parent_group: GroupIdModel | undefined}): Promise<Group>{
+        let request: CreateGroupRequest = {
+            name: create_info.name,
+        }
+        if (create_info.parent_group !== undefined){
+            request.parentGroup = create_info.parent_group
+        }
+        
+        return await this.client.createGroup(request, this.call_options)
     }
     
     public async listGroups(parent_group_id: string|undefined){
         let group_id = this.computeIdModelFromString(parent_group_id)
-        console.log(this.call_options.metadata?.get("Authorization"))
         return await this.client.listGroups(group_id, this.call_options);
+    }
+    
+    public async getGroup(group_id: string){
+        return await this.client.getGroup({id: group_id}, this.call_options);
     }
 
     public async listDatasets(parent_group_id: string|undefined){

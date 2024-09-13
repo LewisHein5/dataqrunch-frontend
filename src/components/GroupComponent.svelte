@@ -1,55 +1,41 @@
 <script lang="ts">
     import type {Group} from "$lib/dataqrunch";
     export let group: Group;
-    export let expanded: boolean;
-    import {Badge, Li, List} from "flowbite-svelte";
-    import {FolderOpenOutline, FolderOutline} from "flowbite-svelte-icons";
-    import DatasetComponent from "./DatasetNameComponent.svelte";  
+    import {Badge} from "flowbite-svelte";
+    import {FolderOutline} from "flowbite-svelte-icons";
 </script>
 
-<div class="group-container">
-    <div class="group-name" on:click={() => {expanded = !expanded}}>
-        {#if expanded}
-            <FolderOpenOutline/>
-        {:else}
-            <FolderOutline/>    
-        {/if}
-        <!--TODO refactor into a group name component-->
-        {group.name}
-        <div>
-            <Badge rounded color="pink">Subgroups {group.subgroups.length}</Badge>
-            <Badge rounded coler="purple">Datasets {group.datasets.length}</Badge>
-        </div>
-        
+<a href="/groups/{group.id.id}">
+    <div class="inline-with-text">
+            <span class="icon">
+                <FolderOutline/>
+            </span>
+            <!--TODO refactor into a group name component-->
+            {group.name}
+            <div>
+                <Badge rounded color="pink">Subgroups {group.subgroups.length}</Badge>
+                <Badge rounded coler="purple">Datasets {group.datasets.length}</Badge>
+            </div>
     </div>
-    {#if expanded}
-        <List tag="ul" class="space-y-1 text-gray-500 dark:text-gray-400" list="none">
-            {#each group.subgroups as subgroup}
-                <Li>
-                    <svelte:self group="{subgroup}" expanded="{false}"></svelte:self>
-                </Li>
-            {/each}
-        </List>
-        <!--TODO: Refactor into datasets list component-->
-        <List tag="ul" class="space-y-1 text-gray-500 dark:text-gray-400" list="none">
-            {#each group.datasets as dataset}
-                <Li icon><DatasetComponent {dataset}/></Li>
-            {/each}
-        </List>
-    {/if}
-</div>
+</a>
+
 
 
 <style>
-    .group-container {
-        margin-left: min(10px, 20%);
+    .inline-with-text {
+        display: flex;
+        align-items: center;
     }
 
-    .group-name {
-        font-size: 1rem;
-        font-weight: normal;
-        margin-bottom: 5px;
-        cursor: pointer;
+    .inline-with-text:hover {
+        display: flex;
+        align-items: center;
+        background: azure;
+    }
+
+    .icon {
+        margin-right: 5px;
+        color: grey;
     }
     
 </style>
