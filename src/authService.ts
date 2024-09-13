@@ -1,16 +1,14 @@
 import {Auth0Client, createAuth0Client, type PopupLoginOptions} from "@auth0/auth0-spa-js";
-import {user,  isAuthenticated, popupOpen} from "./store";
+import {isAuthenticated, popupOpen, user} from "./store";
 import {config} from "./auth_config";
 
 async function createClient() {
-    let auth0Client = await createAuth0Client(
+    return await createAuth0Client(
         {
-            domain: config.domain, 
+            domain: config.domain,
             clientId: config.clientId
         }
     );
-    
-    return auth0Client;
 }
 
 async function loginWithPopup(client: Auth0Client, options: PopupLoginOptions) {

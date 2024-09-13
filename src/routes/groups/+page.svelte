@@ -12,11 +12,11 @@
 
     $: showModal = false;
     
-    async function addDataset(event: CustomEvent<{datasetName: string, columnDefinition: ColumnDef[]}>){
+    async function addDataset(event: CustomEvent<{datasetName: string, columns: ColumnDef[]}>){
         let client = new DataQrunchClientFactory($apiKey).getClientInstance()
         if (client !== undefined){
             //todo: log an error if client is undefined
-            await client.createDataset({name: event.detail.datasetName, columns: event.detail.columnDefinition, constraints: []}) //todo: constraints
+            await client.createDataset({name: event.detail.datasetName, columns: event.detail.columns, constraints: []}) //todo: constraints
         }
     }
 </script>

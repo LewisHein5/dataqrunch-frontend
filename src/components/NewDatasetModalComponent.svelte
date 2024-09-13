@@ -29,7 +29,7 @@
 {#await dataTypes}
     <Spinner/>
 {:then dataTypesForSelect}
-    <Modal bind:open={open} size="xs" autoclose={true} on:close={() => columnDefinitions = [] } class="w-full">
+    <Modal bind:open={open} size="xs" autoclose={true} class="w-full">
         <form class="flex flex-col space-y-6" action="#">
             <Label class="space-y-2">
                 <FloatingLabelInput id="columnName" name="Column Name" type="text" bind:value={datasetName}>Name</FloatingLabelInput>
