@@ -1,12 +1,17 @@
 import {Auth0Client, createAuth0Client, type PopupLoginOptions} from "@auth0/auth0-spa-js";
+import {env} from '$env/dynamic/private'
 import {isAuthenticated, popupOpen, user} from "./store";
-import {config} from "./auth_config";
 
 async function createClient() {
+    let domain = env.AUTH0_DOMAIN;
+    let clientId = env.AUTH0_CLIENT_ID;
+    if (domain === undefined || clientId === undefined){
+        throw new Error("Auth0 info not defined")
+    }
     return await createAuth0Client(
         {
-            domain: config.domain,
-            clientId: config.clientId
+            domain: domain,
+            clientId: clientId
         }
     );
 }
