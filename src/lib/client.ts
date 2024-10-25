@@ -26,7 +26,7 @@ export class Client{
             metadata: Metadata({Authorization: this.auth_token})
         }
         
-        this.channel = createChannel("http://localhost:10000")
+        this.channel = createChannel("http://146.190.58.38:10000")
         this.client = createClient(DataQrunchServiceDefinition, this.channel)
     }
     
@@ -64,6 +64,8 @@ export class Client{
             }
         }
         
+        console.log(request)
+        
         if (create_info.parent_group !== undefined){
             request.parent = create_info.parent_group
         }
@@ -83,6 +85,7 @@ export class Client{
     }
     
     public async listGroups(parent_group_id: string|undefined){
+        console.log(this.call_options)
         let group_id = this.computeIdModelFromString(parent_group_id)
         return await this.client.listGroups(group_id, this.call_options);
     }
