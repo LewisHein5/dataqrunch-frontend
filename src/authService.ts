@@ -6,7 +6,7 @@ async function createClient() {
     let domain = env.AUTH0_DOMAIN;
     let clientId = env.AUTH0_CLIENT_ID;
     if (domain === undefined || clientId === undefined){
-        throw new Error("Auth0 info not defined")
+        throw new Error("Auth0 client or domain not defined")
     }
     return await createAuth0Client(
         {
