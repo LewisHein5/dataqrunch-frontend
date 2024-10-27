@@ -26,7 +26,7 @@ export class Client{
             metadata: Metadata({Authorization: this.auth_token})
         }
         
-        this.channel = createChannel("http://104.248.122.69:10000")
+        this.channel = createChannel("https://api.dataqrunch.com:10000")
         this.client = createClient(DataQrunchServiceDefinition, this.channel)
     }
     
