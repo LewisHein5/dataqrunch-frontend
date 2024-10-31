@@ -13,7 +13,6 @@
     } from "flowbite-svelte-icons";
     import NewDatasetModalComponent from "../../../components/NewDatasetModalComponent.svelte";
     import {DataQrunchClientFactory} from "$lib/client";
-    import {apiKey} from "../../../store";
     import NewGroupModalComponent from "../../../components/NewGroupModalComponent.svelte";
     import type {Dataset, Group} from "$lib/dataqrunch";
 

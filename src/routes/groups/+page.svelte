@@ -1,33 +1,24 @@
 <script lang="ts">
     import GroupComponent from "../../components/GroupComponent.svelte";
-    /** @type {import('./$types').PageData} */
-    export let data;
-
-    import {List, Li, Tooltip, ToolbarButton, Toolbar} from 'flowbite-svelte';
+    import {Li, List, Toolbar, ToolbarButton, Tooltip} from 'flowbite-svelte';
     import DatasetComponent from "../../components/DatasetNameComponent.svelte";
     import {FileCirclePlusOutline, FolderPlusOutline} from "flowbite-svelte-icons";
     import NewDatasetModalComponent from "../../components/NewDatasetModalComponent.svelte";
-    import {DataQrunchClientFactory} from "$lib/client";
-    import {apiKey} from "../../store";
     import NewGroupModalComponent from "../../components/NewGroupModalComponent.svelte";
+
+    /** @type {import('./$types').PageData} */
+    export let data;
 
     $: showNewDatasetModal = false;
     $: showNewGroupModal = false;
     
     async function addDataset(event: CustomEvent<{datasetName: string, columns: ColumnDef[]}>){
-        let client = new DataQrunchClientFactory($apiKey).getClientInstance()
-        if (client !== undefined){
-            //todo: log an error if client is undefined
-            await client.createDataset({name: event.detail.datasetName, columns: event.detail.columns, constraints: [], parent_group: undefined}) //todo: constraints
-        }
+        await fetch("/datasets", {method: "POST", body: JSON.stringify({name: event.detail.datasetName, columns: event.detail.columns, constraints: [], parent_group: undefined})});
     }
     
     async function addGroup(event: CustomEvent<{groupName: string}>) {
-        let client = new DataQrunchClientFactory($apiKey).getClientInstance()
-        if (client !== undefined){
-            //Todo
-            await client.createGroup({name: event.detail.groupName, parent_group: undefined})
-        }
+        //TODO: Use a service layer
+        await fetch("/groups", {method: "POST", body: JSON.stringify({name: event.detail.groupName, parent_group: undefined})});
     }
 </script>
 
@@ -51,5 +42,5 @@
     {/each}
 </List>
 
-<NewDatasetModalComponent bind:open={showNewDatasetModal} on:accepted={addDataset}/>
+<NewDatasetModalComponent bind:open={showNewDatasetModal} on:accepted={addDataset} bind:dataTypes={data.types}/>
 <NewGroupModalComponent bind:open={showNewGroupModal} on:accepted={addGroup}/>

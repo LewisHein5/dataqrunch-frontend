@@ -2,7 +2,6 @@
 import {Client, DataQrunchClientFactory} from "$lib/client";
 import {get_jwt_cookie} from "$lib/utilities";
 
-//todo: use a route parameter
 export async function load({ params, cookies }) {
     let api_key = get_jwt_cookie(cookies)
     //FIXME: Handle undefined client

@@ -16,12 +16,13 @@ import {
     ArrowRightToBracketOutline,
     ChartPieSolid, EditOutline, FolderDuplicateSolid,
 } from "flowbite-svelte-icons";
-import {apiKey, isAuthenticated, user} from "../store.js";
+import {isAuthenticated, user} from "../store.js";
 import type {
     Auth0Client
 } from "@auth0/auth0-spa-js";
 import {onMount} from "svelte";
 import auth from "../authService";
+import {redirect} from "@sveltejs/kit";
 
 let auth0Client: Auth0Client;
 
@@ -46,7 +47,7 @@ onMount(async ()=>{
     let token = await auth0Client.getTokenSilently(options); //TODO: FIXME
     console.log("TOKEN")
     console.log(token);
-    apiKey.set(token)
+    //TODO: use fetch()
     let r = new XMLHttpRequest();
     //TODO: get requests should not have side effects
     r.open("GET", "/login-success")
@@ -56,7 +57,8 @@ onMount(async ()=>{
 });
 
 function login() {
-    auth.loginWithPopup(auth0Client, {authorizationParams: {audience: "localhost/gablorp/whyy"}})    
+    auth.loginWithPopup(auth0Client, {authorizationParams: {audience: "localhost/gablorp/whyy"}})
+    redirect(303, "/groups") //TODO is 303 correct
 }
 
 function logout() {
@@ -123,7 +125,7 @@ function logout() {
                             </svelte:fragment>
                         </SidebarItem>
                     {/if}
-                    <SidebarItem label="Sign Up">
+                    <SidebarItem label="Sign Up" on:click={login}>
                         <svelte:fragment slot="icon">
                             <EditOutline class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
                         </svelte:fragment>
