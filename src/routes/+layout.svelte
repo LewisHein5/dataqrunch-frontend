@@ -16,56 +16,43 @@ import {
     ArrowRightToBracketOutline,
     ChartPieSolid, EditOutline, FolderDuplicateSolid,
 } from "flowbite-svelte-icons";
-import {isAuthenticated, user} from "../store.js";
+import {user, authenticatedToApi} from "../store.js";
 import type {
     Auth0Client
 } from "@auth0/auth0-spa-js";
 import {onMount} from "svelte";
 import auth from "../authService";
 import {redirect} from "@sveltejs/kit";
+import {get_api_session_token} from "$lib/utilities";
 
 let auth0Client: Auth0Client;
 
 onMount(async ()=>{
+    user.subscribe(async (x) => {
+        await get_api_session_token(x)
+    })
     auth0Client = await auth.createClient();
-    isAuthenticated.set(await auth0Client.isAuthenticated());
-    let auth0User = await auth0Client.getUser();
-    if (auth0User === undefined){
-        isAuthenticated.set(false);
+    let isAuthenticated = await auth0Client.isAuthenticated();
+    if (!isAuthenticated){
+        user.set(undefined);
         return;
     }
-    /*let token = undefined
-    while (token === undefined){ //TODO FIXME infinite loop
-        try {
-            token = await auth0Client.getTokenSilently({authorizationParams: {audience: "localhost/gablorp/whyy"}})
-        }
-        catch (e){
-            token = await auth0Client.getTokenWithPopup({authorizationParams: {audience: "localhost/gablorp/whyy"}});
-        }
-    }*/
-    let options = {authorizationParams: {audience: "localhost/gablorp/whyy"}}
-    let token = await auth0Client.getTokenSilently(options); //TODO: FIXME
-    console.log("TOKEN")
-    console.log(token);
-    //TODO: use fetch()
-    let r = new XMLHttpRequest();
-    //TODO: get requests should not have side effects
-    r.open("GET", "/login-success")
-    r.setRequestHeader("jwt", token);
-    r.send()
+    let auth0User = await auth0Client.getUser();
+    if (auth0User == undefined){
+        return;
+    } 
+    
     user.set(auth0User);
 });
 
-function login() {
-    auth.loginWithPopup(auth0Client, {authorizationParams: {audience: "localhost/gablorp/whyy"}})
-    redirect(303, "/groups") //TODO is 303 correct
+async function login() {
+    await auth.loginWithPopup(auth0Client, {authorizationParams: {audience: "localhost/gablorp/whyy"}})
+    redirect(307, "/groups")
 }
 
 function logout() {
-    let r = new XMLHttpRequest()
-    r.open("GET", "/logout") //TODO: GET request with a side effect
-    r.send()
     auth.logout(auth0Client);
+    user.set(undefined);
 }
 </script>
 
@@ -80,13 +67,13 @@ function logout() {
             <NavUl class="nav-list">
                 <NavLi href="/">Home</NavLi>
                 <NavLi href="/about">About</NavLi>
-                {#if !$isAuthenticated}
+                {#if !$authenticatedToApi}
                     <NavLi>
                         <Button on:click={login}>Log in</Button>
                     </NavLi>
                 {:else}
                     <NavLi>
-                        Hello, {$user.name}
+                        Hello, {$user?.name}
                     </NavLi>
                     <NavLi>
                         <Button on:click={logout}>Log out</Button>
@@ -105,14 +92,14 @@ function logout() {
                             <ChartPieSolid class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
                         </svelte:fragment>
                     </SidebarItem>
-                    {#if $isAuthenticated}
+                    {#if $authenticatedToApi}
                         <SidebarItem label="Datasets" href="/groups">
                             <svelte:fragment slot="icon">
                                 <FolderDuplicateSolid class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"/>
                             </svelte:fragment>
                         </SidebarItem>
                     {/if}
-                    {#if !$isAuthenticated}
+                    {#if !$authenticatedToApi}
                         <SidebarItem label="Sign In" on:click={login}>
                             <svelte:fragment slot="icon">
                                 <ArrowRightToBracketOutline class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
@@ -136,7 +123,7 @@ function logout() {
     </aside>
     <main class="content">
         <slot></slot>
-        {#if !$isAuthenticated}
+        {#if !authenticatedToApi}
             <Button on:click={login}>Log in</Button>
         {/if}
     </main>

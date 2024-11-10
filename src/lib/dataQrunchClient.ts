@@ -1,4 +1,4 @@
-import {type Channel, createChannel, createClient, Metadata} from "nice-grpc-web";
+import {type Channel, createChannel, createClient, FetchTransport, Metadata} from "nice-grpc-web";
 import {
     type CreateDatasetRequest, type CreateGroupRequest,
     type DataQrunchServiceClient,
@@ -13,20 +13,15 @@ import type {DatasetConstraint} from "$lib/models/DatasetConstraint";
 To compile lib from proto file run from src/lib:
 ../../node_modules/.bin/grpc_tools_node_protoc   --plugin=protoc-gen-ts_proto=../../node_modules/.bin/protoc-gen-ts_proto   --ts_proto_out=.   --ts_proto_opt=env=browser,outputServices=nice-grpc,outputServices=generic-definitions,outputJsonMethods=false,useExactTypes=false   --proto_path=../../proto   ../../proto/dataqrunch.proto
  */
-export class Client{
+export class DataQrunchClient {
     private channel: Channel;
     private client: DataQrunchServiceClient
-    private auth_token: string;
+    private readonly auth_token: string|undefined;
     private call_options: CallOptions;
     
-    constructor(auth_token: string) {
-        this.auth_token = auth_token
-        //TODO: USe the auth everywhere
-        this.call_options = {
-            metadata: Metadata({Authorization: this.auth_token})
-        }
-        
-        this.channel = createChannel("https://api.dataqrunch.com:10000")
+    constructor() {
+        this.call_options = {}
+        this.channel = createChannel("https://api.dataqrunch.com:10000", FetchTransport({credentials: "include"}))
         this.client = createClient(DataQrunchServiceDefinition, this.channel)
     }
     
@@ -85,7 +80,6 @@ export class Client{
     }
     
     public async listGroups(parent_group_id: string|undefined){
-        console.log(this.call_options)
         let group_id = this.computeIdModelFromString(parent_group_id)
         return await this.client.listGroups(group_id, this.call_options);
     }
@@ -110,21 +104,5 @@ export class Client{
 
     private computeIdModelFromString(parent_group_id: string | undefined) {
         return parent_group_id === undefined ? {} : {group: this.createIdModel(parent_group_id)};
-    }
-}
-
-export class DataQrunchClientFactory {
-    private readonly client: Client | undefined;
-    constructor(authToken: string) {
-        if (authToken === undefined || authToken === ""){
-            this.client = undefined;
-        }
-        else {
-            this.client = new Client(authToken)
-        }
-    }
-    
-    public getClientInstance() {
-        return this.client;
     }
 }

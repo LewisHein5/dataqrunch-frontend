@@ -12,27 +12,21 @@
         HomeOutline
     } from "flowbite-svelte-icons";
     import NewDatasetModalComponent from "../../../components/NewDatasetModalComponent.svelte";
-    import {DataQrunchClientFactory} from "$lib/client";
     import NewGroupModalComponent from "../../../components/NewGroupModalComponent.svelte";
     import type {Dataset, Group} from "$lib/dataqrunch";
+    import {DataQrunchClient} from "$lib/dataQrunchClient";
 
     $: showNewDatasetModal = false;
     $: showNewGroupModal = false;
     
     async function addDataset(event: CustomEvent<{datasetName: string, columns: ColumnDef[]}>){
-        let client = new DataQrunchClientFactory($apiKey).getClientInstance()
-        if (client !== undefined){
-            //todo: log an error if client is undefined
-            await client.createDataset({name: event.detail.datasetName, columns: event.detail.columns, constraints: [], parent_group: data.current_group.id}) //todo: constraints
-        }
+        let client = new DataQrunchClient()
+        await client.createDataset({name: event.detail.datasetName, columns: event.detail.columns, constraints: [], parent_group: data.current_group.id}) //todo: constraints
     }
     
     async function addGroup(event: CustomEvent<{groupName: string}>) {
-        let client = new DataQrunchClientFactory($apiKey).getClientInstance()
-        if (client !== undefined){
-            //Todo
-            await client.createGroup({name: event.detail.groupName, parent_group: data.current_group.id})
-        }
+        let client = new DataQrunchClient()
+        await client.createGroup({name: event.detail.groupName, parent_group: data.current_group.id})
     }
 </script>
 

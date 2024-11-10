@@ -1,5 +1,5 @@
 import {Auth0Client, createAuth0Client, type PopupLoginOptions} from "@auth0/auth0-spa-js";
-import {isAuthenticated, popupOpen, user} from "./store";
+import {popupOpen, user} from "./store";
 import {config} from "./auth_config";
 
 async function createClient() {
@@ -20,7 +20,6 @@ async function loginWithPopup(client: Auth0Client, options: PopupLoginOptions) {
             throw Error("Unable to authenticate")
         }
         user.set(auth0User)
-        isAuthenticated.set(true);
     } catch(e) {
         console.error(e);
     } finally {
