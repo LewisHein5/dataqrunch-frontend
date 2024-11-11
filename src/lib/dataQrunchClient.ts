@@ -1,10 +1,15 @@
-import {type Channel, createChannel, createClient, FetchTransport, Metadata} from "nice-grpc-web";
+import {type Channel, createChannel, createClient, FetchTransport} from "nice-grpc-web";
 import {
-    type CreateDatasetRequest, type CreateGroupRequest,
+    type CreateDatasetRequest,
+    type CreateGroupRequest,
     type DataQrunchServiceClient,
     DataQrunchServiceDefinition,
-    type Dataset, type DatasetIdModel,
-    type DatasetRow, DatasetRowUploadRequest, type Group, type GroupIdModel
+    type Dataset,
+    type DatasetIdModel,
+    type DatasetRow,
+    DatasetRowUploadRequest,
+    type Group,
+    type GroupIdModel
 } from "$lib/dataqrunch";
 import type {CallOptions} from "nice-grpc-common";
 import type {DatasetConstraint} from "$lib/models/DatasetConstraint";
@@ -16,7 +21,6 @@ To compile lib from proto file run from src/lib:
 export class DataQrunchClient {
     private channel: Channel;
     private client: DataQrunchServiceClient
-    private readonly auth_token: string|undefined;
     private call_options: CallOptions;
     
     constructor() {

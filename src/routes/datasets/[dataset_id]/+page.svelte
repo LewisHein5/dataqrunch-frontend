@@ -8,30 +8,59 @@
     import {defineCustomElements} from '@revolist/revogrid/loader';
     import {type Dataset, type DatasetRow, DatasetSpec} from "$lib/dataqrunch";
     import NewColumnModalComponent from "../../../components/NewColumnModalComponent.svelte";
+    import {DataQrunchClient} from "$lib/dataQrunchClient";
+    import {authenticatedToApi} from "../../../store";
 
     defineCustomElements();
     /** @type {import('./$types').PageData} */
     
-    export let data: { dataset: Dataset, rows: DatasetRow[], types: string[] };
-    $: spec = data.dataset.spec[data.dataset.spec.length - 1] as DatasetSpec;
-    $: columns = spec.columns.map((x) => {return {prop: x.columnName, name: x.columnName}})
-    $: datasetRowObjects = data.rows.map((x:DatasetRow) => {
-        let model = {}
-        spec.columns.forEach((col,index) => {
-            model[col.columnName] = x.data[index];
-        });
-        return model;
-    });
+    export let data: {dataset_id: string};
+    let dataset_data: Promise<{ dataset: Dataset, rows: DatasetRow[], types: string[] }>;
+    $: dataset_data;
+    let spec: DatasetSpec;
+    $: spec;
+    let columns: {prop: string,  name: string}[];
+    $: columns;
+    let datasetRowObjects: any[];
+    $: datasetRowObjects;
     $: focusedCell = {col: -1, row: -1};
-
-    $: source = [...datasetRowObjects, blankRow()]
+    let source: any[];
+    $: source;
+    
+    let client = new DataQrunchClient()
     let showModal=false;
-    //TODO: Should the load function return the client object?
+    async function load() {
+        let id = data.dataset_id;
+        let client: DataQrunchClient = new DataQrunchClient()
+        let dataset = await client.getDataset(id);
+        let rows = await client.getAllDatasetRows(id);
+        let types = await client.listDataTypes();
+        spec = dataset.spec[dataset.spec.length - 1] as DatasetSpec;
+        columns = spec.columns.map((x) => {return {prop: x.columnName, name: x.columnName}})
+        datasetRowObjects = rows.map((x:DatasetRow) => {
+            let model = {}
+            spec.columns.forEach((col,index) => {
+                //@ts-expect-error
+                model[col.columnName] = x.data[index];
+            });
+            return model;
+        });
+        source = [...datasetRowObjects, blankRow()]
+
+        return {dataset: dataset, rows: rows, types: types}
+    }
+    
+    authenticatedToApi.subscribe((authenticated) =>{
+        if (authenticated){
+            dataset_data = load()
+        }
+    })
     
     function blankRow(){
         let blankRow = {};
         spec.columns.forEach((col) => {
-            blankRow[col.columnName] = "";
+            //@ts-expect-error
+            blankRow[col.columnName] = ""; 
         });
 
         return blankRow;
@@ -39,7 +68,6 @@
     }
     function onBeforeEdit(e: RevoGridCustomEvent<any>){
         focusedCell = {col: e.detail.colIndex, row: e.detail.rowIndex};
-        console.log(focusedCell)
         if (e.detail.rowIndex === source.length-1){
             source = [...source, blankRow()]
         }
@@ -55,19 +83,18 @@
         }
         // TODO: Race condition if spec changes. Get an immutable copy of spec
         let versionNumber = spec.version
-
-        await fetch("rows", {method: "POST", body: JSON.stringify({dataset_id: data.dataset.id.id, row_num: focusedCell.row, row_data: rowData, version_number: versionNumber})})
+        await client.saveRow(data.dataset_id, focusedCell.row, rowData, versionNumber)
     }
     
     //TODO: All these functions need to go into a service layer
-    async function addColumn(event: CustomEvent<ColumnDef>){
+    async function addColumn(event: CustomEvent<ColumnDef>, old_dataset: Dataset){
         let newSpec = spec;
         console.log(event.detail.dataType)
         newSpec.columns.push({columnName: event.detail.columnName, dataType: event.detail.dataType})
         spec = newSpec;
         
-        let dataset: Dataset = {spec: [spec], id: data.dataset.id, name: data.dataset.name}
-        await fetch("/datasets", {method: "PUT", body: JSON.stringify(dataset)})
+        let dataset: Dataset = {spec: [spec], id: old_dataset.id, name: old_dataset.name}
+        await client.saveDataset(dataset);
     }
 </script>
 <Breadcrumb aria-label="Solid background breadcrumb example" class="bg-gray-50 py-3 px-5 dark:bg-gray-900">
@@ -87,12 +114,16 @@
         <svelte:fragment slot="icon">
         <ChevronDoubleRightOutline class="w-5 h-5 mx-2 dark:text-white" />
         </svelte:fragment>
-        {data.dataset.name}
+        {data.dataset_id}
     </BreadcrumbItem>
 </Breadcrumb>
 <Toolbar>
     <ToolbarButton on:click={() => (showModal=true)} class="toolbar-button"><GridPlusOutline></GridPlusOutline> New Column</ToolbarButton>
     <Tooltip>Add a new column</Tooltip>
 </Toolbar>
-<RevoGrid {source} {columns} on:beforeedit={onBeforeEdit} on:afteredit={onAfterEdit} rowHeaders=true></RevoGrid>
-<NewColumnModalComponent bind:open={showModal} on:accepted={addColumn} bind:dataTypes={data.types}/>
+{#await dataset_data}
+	loading...
+{:then dataset_data}
+    <RevoGrid {source} {columns} on:beforeedit={onBeforeEdit} on:afteredit={onAfterEdit} rowHeaders=true></RevoGrid>
+    <NewColumnModalComponent bind:open={showModal} on:accepted={(event)=>{addColumn(event, dataset_data.dataset)}} />
+{/await}

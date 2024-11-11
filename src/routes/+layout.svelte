@@ -22,8 +22,8 @@ import type {
 } from "@auth0/auth0-spa-js";
 import {onMount} from "svelte";
 import auth from "../authService";
-import {redirect} from "@sveltejs/kit";
-import {get_api_session_token} from "$lib/utilities";
+import {erase_api_session_token, get_api_session_token} from "$lib/utilities";
+import {goto} from "$app/navigation";
 
 let auth0Client: Auth0Client;
 
@@ -31,6 +31,9 @@ onMount(async ()=>{
     user.subscribe(async (x) => {
         await get_api_session_token(x)
     })
+    if (!$authenticatedToApi){
+        await goto("/")
+    }
     auth0Client = await auth.createClient();
     let isAuthenticated = await auth0Client.isAuthenticated();
     if (!isAuthenticated){
@@ -46,13 +49,18 @@ onMount(async ()=>{
 });
 
 async function login() {
+    auth0Client = await auth.createClient();
     await auth.loginWithPopup(auth0Client, {authorizationParams: {audience: "localhost/gablorp/whyy"}})
-    redirect(307, "/groups")
+    let auth0User = await auth0Client.getUser();
+    user.set(auth0User)
+    await goto("/groups")
 }
 
-function logout() {
-    auth.logout(auth0Client);
+async function logout() {
+    await auth.logout(auth0Client);
     user.set(undefined);
+    await erase_api_session_token();
+    await goto("/")
 }
 </script>
 

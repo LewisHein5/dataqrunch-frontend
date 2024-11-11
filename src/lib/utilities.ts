@@ -17,13 +17,14 @@ export async function get_api_session_token(user: User | undefined) {
             authenticatedToApi.set(true)
         }
     }
-    else{
-        await fetch("https://api.dataqrunch.com:10000",
-            {
-                method: "GET",
-                credentials: "include",
-                headers: {"authorization": ""}
-            });
-        authenticatedToApi.set(false)
-    }
+}
+
+export async function erase_api_session_token(){
+    await fetch("https://api.dataqrunch.com:10000",
+        {
+            method: "GET",
+            credentials: "include",
+            headers: {"authorization": ""}
+        });
+    authenticatedToApi.set(false)
 }
