@@ -26,7 +26,6 @@ import {erase_api_session_token, get_api_session_token} from "$lib/utilities";
 import {goto} from "$app/navigation";
 
 let auth0Client: Auth0Client;
-
 onMount(async ()=>{
     user.subscribe(async (x) => {
         await get_api_session_token(x)

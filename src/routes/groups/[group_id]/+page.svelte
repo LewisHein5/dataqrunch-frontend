@@ -1,7 +1,7 @@
 <script lang="ts">
     import GroupComponent from "../../../components/GroupComponent.svelte";
     /** @type {import('./$types').PageData} */
-    import {List, Li, Tooltip, ToolbarButton, Toolbar, BreadcrumbItem, Breadcrumb} from 'flowbite-svelte';
+    import {Breadcrumb, BreadcrumbItem, Li, List, Toolbar, ToolbarButton, Tooltip} from 'flowbite-svelte';
     import DatasetComponent from "../../../components/DatasetNameComponent.svelte";
     import {
         ChevronDoubleRightOutline,
@@ -14,13 +14,21 @@
     import type {Dataset, Group} from "$lib/dataqrunch";
     import {DataQrunchClient} from "$lib/dataQrunchClient";
     import {authenticatedToApi} from "../../../store";
-    
+    import LoadingComponent from "../../../components/LoadingComponent.svelte";
+
     export let data: {group_id: string};
-    
+
     let groups_data_promise: Promise<{groups: Group[], datasets: Dataset[], current_group: Group, types: string[]}>;
-
     $: groups_data_promise;
+    console.log($authenticatedToApi)
+    authenticatedToApi.subscribe(async (authenticated)=>{
+        if (authenticated){
+            groups_data_promise = load()
+        }
+    })
 
+    $: showNewDatasetModal = false;
+    $: showNewGroupModal = false;
 
     async function load() {
         let client: DataQrunchClient = new DataQrunchClient();
@@ -31,15 +39,8 @@
         let types = await client.listDataTypes();
 
         return {groups: groups.groups,  datasets: datasets.datasets, current_group, types: types}
+    
     }
-    authenticatedToApi.subscribe((authenticated)=>{
-        if (authenticated){
-            groups_data_promise = load()
-        }
-    })
-
-    $: showNewDatasetModal = false;
-    $: showNewGroupModal = false;
     
     async function addDataset(event: CustomEvent<{datasetName: string, columns: ColumnDef[]}>){
         let client = new DataQrunchClient()
@@ -52,7 +53,9 @@
     }
 </script>
 
-{#await groups_data_promise then groups_data}
+{#await groups_data_promise}
+    <LoadingComponent/>
+{:then groups_data}
     <Breadcrumb aria-label="Solid background breadcrumb example" class="bg-gray-50 py-3 px-5 dark:bg-gray-900">
         <BreadcrumbItem href="/" home>
             <svelte:fragment slot="icon">

@@ -1,13 +1,19 @@
 <script lang="ts">
     import GroupComponent from "../../components/GroupComponent.svelte";
-    import {Li, List, Toolbar, ToolbarButton, Tooltip} from 'flowbite-svelte';
+    import {BreadcrumbItem, Li, List, Toolbar, ToolbarButton, Tooltip} from 'flowbite-svelte';
     import DatasetComponent from "../../components/DatasetNameComponent.svelte";
-    import {FileCirclePlusOutline, FolderPlusOutline} from "flowbite-svelte-icons";
+    import {
+        ChevronDoubleRightOutline,
+        FileCirclePlusOutline,
+        FolderPlusOutline,
+        HomeOutline
+    } from "flowbite-svelte-icons";
     import NewDatasetModalComponent from "../../components/NewDatasetModalComponent.svelte";
     import NewGroupModalComponent from "../../components/NewGroupModalComponent.svelte";
     import {DataQrunchClient} from "$lib/dataQrunchClient";
     import {authenticatedToApi} from "../../store";
     import type {Dataset, Group} from "$lib/dataqrunch";
+    import LoadingComponent from "../../components/LoadingComponent.svelte";
 
     /** @type {import('./$types').PageData} */
     let groups_data: Promise<{groups: Group[], datasets: Dataset[], types: string[]}>;
@@ -38,22 +44,30 @@
     async function addGroup(event: CustomEvent<{groupName: string}>) {
         await client.createGroup({name: event.detail.groupName, parent_group: undefined});
     }
-    let grr = ["grr"]
 </script>
 
-{#if $authenticatedToApi}
+{#await groups_data}
+    <LoadingComponent/>
+{:then data}
+    <BreadcrumbItem href="/" home>
+        <svelte:fragment slot="icon">
+            <HomeOutline class="w-4 h-4 me-2"/>
+        </svelte:fragment>
+        Home
+    </BreadcrumbItem>
+    <BreadcrumbItem href="/groups">
+        <svelte:fragment slot="icon">
+            <ChevronDoubleRightOutline class="w-5 h-5 mx-2 dark:text-white"/>
+        </svelte:fragment>
+        Datasets
+    </BreadcrumbItem>
     <Toolbar>
         <ToolbarButton on:click={() => (showNewDatasetModal=true)} class="toolbar-button"><FileCirclePlusOutline/>New Dataset</ToolbarButton>
         <Tooltip>Add a new dataset</Tooltip>
-        
+
         <ToolbarButton on:click={() => (showNewGroupModal = true)} class="toolbar-button"><FolderPlusOutline/>New Folder</ToolbarButton>
         <Tooltip>Add a new folder</Tooltip>
     </Toolbar>
-{/if}
-
-{#await groups_data}
-    loading...
-{:then data}
     <List tag="ul" class="space-y-1 text-gray-500 dark:text-gray-400" list="none">
         {#each data.groups as group} 
             <Li>
