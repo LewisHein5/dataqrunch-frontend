@@ -20,7 +20,6 @@
 
     let groups_data_promise: Promise<{groups: Group[], datasets: Dataset[], current_group: Group, types: string[]}>;
     $: groups_data_promise;
-    console.log($authenticatedToApi)
     authenticatedToApi.subscribe(async (authenticated)=>{
         if (authenticated){
             groups_data_promise = load()
@@ -56,45 +55,49 @@
 {#await groups_data_promise}
     <LoadingComponent/>
 {:then groups_data}
-    <Breadcrumb aria-label="Solid background breadcrumb example" class="bg-gray-50 py-3 px-5 dark:bg-gray-900">
-        <BreadcrumbItem href="/" home>
-            <svelte:fragment slot="icon">
-                <HomeOutline class="w-4 h-4 me-2"/>
-            </svelte:fragment>
-            Home
-        </BreadcrumbItem>
-        <BreadcrumbItem href="/groups">
-            <svelte:fragment slot="icon">
-                <ChevronDoubleRightOutline class="w-5 h-5 mx-2 dark:text-white"/>
-            </svelte:fragment>
-            Datasets
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-            <svelte:fragment slot="icon">
-                <ChevronDoubleRightOutline class="w-5 h-5 mx-2 dark:text-white" />
-            </svelte:fragment>
-            {groups_data.current_group.name}
-        </BreadcrumbItem>
-    </Breadcrumb>
-    <Toolbar>
-        <ToolbarButton on:click={() => (showNewDatasetModal=true)} class="toolbar-button"><FileCirclePlusOutline/>New Dataset</ToolbarButton>
-        <Tooltip>Add a new dataset</Tooltip>
-
-        <ToolbarButton on:click={() => (showNewGroupModal = true)} class="toolbar-button"><FolderPlusOutline/>New Folder</ToolbarButton>
-        <Tooltip>Add a new folder</Tooltip>
-    </Toolbar>
-    <List tag="ul" class="space-y-1 text-gray-500 dark:text-gray-400" list="none">
-        {#each groups_data.groups as group}
-            <Li>
-                <GroupComponent group="{group}"></GroupComponent>
-            </Li>
-        {/each}
-        {#each groups_data.datasets as dataset}
-            <Li>
-                <DatasetComponent {dataset}/>
-            </Li>
-        {/each}
-    </List>
-    <NewDatasetModalComponent bind:open={showNewDatasetModal} on:accepted={addDataset}/>
-    <NewGroupModalComponent bind:open={showNewGroupModal} on:accepted={addGroup}/>
+    {#if groups_data === undefined}
+        <LoadingComponent/>
+    {:else}
+        <Breadcrumb aria-label="Solid background breadcrumb example" class="bg-gray-50 py-3 px-5 dark:bg-gray-900">
+            <BreadcrumbItem href="/" home>
+                <svelte:fragment slot="icon">
+                    <HomeOutline class="w-4 h-4 me-2"/>
+                </svelte:fragment>
+                Home
+            </BreadcrumbItem>
+            <BreadcrumbItem href="/groups">
+                <svelte:fragment slot="icon">
+                    <ChevronDoubleRightOutline class="w-5 h-5 mx-2 dark:text-white"/>
+                </svelte:fragment>
+                Datasets
+            </BreadcrumbItem>
+            <BreadcrumbItem>
+                <svelte:fragment slot="icon">
+                    <ChevronDoubleRightOutline class="w-5 h-5 mx-2 dark:text-white" />
+                </svelte:fragment>
+                {groups_data.current_group.name}
+            </BreadcrumbItem>
+        </Breadcrumb>
+        <Toolbar>
+            <ToolbarButton on:click={() => (showNewDatasetModal=true)} class="toolbar-button"><FileCirclePlusOutline/>New Dataset</ToolbarButton>
+            <Tooltip>Add a new dataset</Tooltip>
+    
+            <ToolbarButton on:click={() => (showNewGroupModal = true)} class="toolbar-button"><FolderPlusOutline/>New Folder</ToolbarButton>
+            <Tooltip>Add a new folder</Tooltip>
+        </Toolbar>
+        <List tag="ul" class="space-y-1 text-gray-500 dark:text-gray-400" list="none">
+            {#each groups_data.groups as group}
+                <Li>
+                    <GroupComponent group="{group}"></GroupComponent>
+                </Li>
+            {/each}
+            {#each groups_data.datasets as dataset}
+                <Li>
+                    <DatasetComponent {dataset}/>
+                </Li>
+            {/each}
+        </List>
+        <NewDatasetModalComponent bind:open={showNewDatasetModal} on:accepted={addDataset}/>
+        <NewGroupModalComponent bind:open={showNewGroupModal} on:accepted={addGroup}/>
+    {/if}
 {/await}

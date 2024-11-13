@@ -1,6 +1,6 @@
 import auth from "../authService";
 import type {User} from "@auth0/auth0-spa-js";
-import {authenticatedToApi} from "../store";
+import {authenticatedToApi, user} from "../store";
 
 export async function get_api_session_token(user: User | undefined) {
     if (user != undefined) {
@@ -27,4 +27,19 @@ export async function erase_api_session_token(){
             headers: {"authorization": ""}
         });
     authenticatedToApi.set(false)
+}
+
+export async function silentLogin() {
+    let auth0Client = await auth.createClient();
+    let isAuthenticated = await auth0Client.isAuthenticated();
+    if (!isAuthenticated) {
+        user.set(undefined);
+        return false;
+    }
+    let auth0User = await auth0Client.getUser();
+    if (auth0User == undefined) {
+        return false;
+    }
+    user.set(auth0User);
+    return true;
 }

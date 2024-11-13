@@ -4,7 +4,6 @@
     import ColumnDefinitionComponent from "./ColumnDefinitionComponent.svelte";
 
     export let open = false
-    export let dataTypes: string[] = [];
     $: selected = -1
     $: colName = ""
     
@@ -23,7 +22,7 @@
 
 <Modal bind:open={open} size="xs" autoclose={true} class="w-full">
     <form class="flex flex-col space-y-6" action="#">
-        <ColumnDefinitionComponent bind:colName={colName} bind:selected={selected} dataTypes="{dataTypes}"/>
+        <ColumnDefinitionComponent bind:colName={colName} bind:selected={selected}/>
         <Button type="submit" class="w-full1" on:click={dispatchAccepted}>Add Column</Button>
     </form>
 </Modal>

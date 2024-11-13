@@ -14,41 +14,30 @@ import {
 import {
     ArrowLeftToBracketOutline,
     ArrowRightToBracketOutline,
-    ChartPieSolid, EditOutline, FolderDuplicateSolid,
+    ChartPieSolid,
+    EditOutline,
+    FolderDuplicateSolid,
 } from "flowbite-svelte-icons";
-import {user, authenticatedToApi} from "../store.js";
-import type {
-    Auth0Client
-} from "@auth0/auth0-spa-js";
+import {authenticatedToApi, user} from "../store.js";
 import {onMount} from "svelte";
 import auth from "../authService";
-import {erase_api_session_token, get_api_session_token} from "$lib/utilities";
+import {erase_api_session_token, get_api_session_token, silentLogin} from "$lib/utilities";
 import {goto} from "$app/navigation";
 
-let auth0Client: Auth0Client;
+user.subscribe(async (x) => {
+    await get_api_session_token(x)
+})
+
 onMount(async ()=>{
-    user.subscribe(async (x) => {
-        await get_api_session_token(x)
-    })
-    if (!$authenticatedToApi){
+    let login_success = await silentLogin();
+    if (!login_success){
         await goto("/")
     }
-    auth0Client = await auth.createClient();
-    let isAuthenticated = await auth0Client.isAuthenticated();
-    if (!isAuthenticated){
-        user.set(undefined);
-        return;
-    }
-    let auth0User = await auth0Client.getUser();
-    if (auth0User == undefined){
-        return;
-    } 
-    
-    user.set(auth0User);
 });
 
+
 async function login() {
-    auth0Client = await auth.createClient();
+    let auth0Client = await auth.createClient();
     await auth.loginWithPopup(auth0Client, {authorizationParams: {audience: "localhost/gablorp/whyy"}})
     let auth0User = await auth0Client.getUser();
     user.set(auth0User)
@@ -56,6 +45,7 @@ async function login() {
 }
 
 async function logout() {
+    let auth0Client = await auth.createClient()
     await auth.logout(auth0Client);
     user.set(undefined);
     await erase_api_session_token();

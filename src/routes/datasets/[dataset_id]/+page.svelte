@@ -102,30 +102,34 @@
 {#await dataset_data}
 	<LoadingComponent/>
 {:then dataset_data}
-    <Breadcrumb aria-label="Solid background breadcrumb example" class="bg-gray-50 py-3 px-5 dark:bg-gray-900">
-        <BreadcrumbItem href="/" home>
-            <svelte:fragment slot="icon">
-                <HomeOutline class="w-4 h-4 me-2"/>
-            </svelte:fragment>
-            Home
-        </BreadcrumbItem>
-        <BreadcrumbItem href="/groups">
-            <svelte:fragment slot="icon">
-                <ChevronDoubleRightOutline class="w-5 h-5 mx-2 dark:text-white"/>
-            </svelte:fragment>
-            Datasets
-        </BreadcrumbItem>
-        <BreadcrumbItem>
-            <svelte:fragment slot="icon">
-                <ChevronDoubleRightOutline class="w-5 h-5 mx-2 dark:text-white" />
-            </svelte:fragment>
-            {dataset_data.dataset.name}
-        </BreadcrumbItem>
-    </Breadcrumb>
-    <Toolbar>
-        <ToolbarButton on:click={() => (showModal=true)} class="toolbar-button"><GridPlusOutline></GridPlusOutline> New Column</ToolbarButton>
-        <Tooltip>Add a new column</Tooltip>
-    </Toolbar>
-    <RevoGrid {source} {columns} on:beforeedit={onBeforeEdit} on:afteredit={onAfterEdit} rowHeaders=true></RevoGrid>
-    <NewColumnModalComponent bind:open={showModal} on:accepted={(event)=>{addColumn(event, dataset_data.dataset)}} />
+    {#if dataset_data === undefined}
+        <LoadingComponent/>
+    {:else}
+        <Breadcrumb aria-label="Solid background breadcrumb example" class="bg-gray-50 py-3 px-5 dark:bg-gray-900">
+            <BreadcrumbItem href="/" home>
+                <svelte:fragment slot="icon">
+                    <HomeOutline class="w-4 h-4 me-2"/>
+                </svelte:fragment>
+                Home
+            </BreadcrumbItem>
+            <BreadcrumbItem href="/groups">
+                <svelte:fragment slot="icon">
+                    <ChevronDoubleRightOutline class="w-5 h-5 mx-2 dark:text-white"/>
+                </svelte:fragment>
+                Datasets
+            </BreadcrumbItem>
+            <BreadcrumbItem>
+                <svelte:fragment slot="icon">
+                    <ChevronDoubleRightOutline class="w-5 h-5 mx-2 dark:text-white" />
+                </svelte:fragment>
+                {dataset_data.dataset.name}
+            </BreadcrumbItem>
+        </Breadcrumb>
+        <Toolbar>
+            <ToolbarButton on:click={() => (showModal=true)} class="toolbar-button"><GridPlusOutline></GridPlusOutline> New Column</ToolbarButton>
+            <Tooltip>Add a new column</Tooltip>
+        </Toolbar>
+        <RevoGrid {source} {columns} on:beforeedit={onBeforeEdit} on:afteredit={onAfterEdit} rowHeaders=true></RevoGrid>
+        <NewColumnModalComponent bind:open={showModal} on:accepted={(event)=>{addColumn(event, dataset_data.dataset)}} />
+    {/if}
 {/await}
