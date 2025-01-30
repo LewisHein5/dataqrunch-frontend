@@ -3,9 +3,15 @@
     import {createEventDispatcher} from "svelte";
     import ColumnDefinitionComponent from "./ColumnDefinitionComponent.svelte";
 
-    export let open = false
-    $: selected = -1
-    $: colName = ""
+   interface Props {
+      open?: boolean;
+   }
+
+   let { open = $bindable(false) }: Props = $props();
+    let selected = $state(-1);
+   
+    let colName = $state("");
+   
     
 
     const dispatch = createEventDispatcher();

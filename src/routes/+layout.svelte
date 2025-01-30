@@ -23,6 +23,11 @@ import {onMount} from "svelte";
 import auth from "../authService";
 import {erase_api_session_token, get_api_session_token, silentLogin} from "$lib/utilities";
 import {goto} from "$app/navigation";
+    interface Props {
+        children?: import('svelte').Snippet;
+    }
+
+    let { children }: Props = $props();
 
 user.subscribe(async (x) => {
     await get_api_session_token(x)
@@ -85,41 +90,51 @@ async function logout() {
             <SidebarWrapper style="width: 80%; overflow:hidden">
                 <SidebarGroup>
                     <SidebarItem label="Dashboard">
-                        <svelte:fragment slot="icon">
-                            <ChartPieSolid class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
-                        </svelte:fragment>
+                        {#snippet icon()}
+                                            
+                                <ChartPieSolid class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+                            
+                                            {/snippet}
                     </SidebarItem>
                     {#if $authenticatedToApi}
                         <SidebarItem label="Datasets" href="/groups">
-                            <svelte:fragment slot="icon">
-                                <FolderDuplicateSolid class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"/>
-                            </svelte:fragment>
+                            {#snippet icon()}
+                                                    
+                                    <FolderDuplicateSolid class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"/>
+                                
+                                                    {/snippet}
                         </SidebarItem>
                     {/if}
                     {#if !$authenticatedToApi}
                         <SidebarItem label="Sign In" on:click={login}>
-                            <svelte:fragment slot="icon">
-                                <ArrowRightToBracketOutline class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
-                            </svelte:fragment>
+                            {#snippet icon()}
+                                                    
+                                    <ArrowRightToBracketOutline class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+                                
+                                                    {/snippet}
                         </SidebarItem>
                     {:else }
                         <SidebarItem label="Sign Out" on:click={login}>
-                            <svelte:fragment slot="icon">
-                                <ArrowLeftToBracketOutline class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
-                            </svelte:fragment>
+                            {#snippet icon()}
+                                                    
+                                    <ArrowLeftToBracketOutline class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+                                
+                                                    {/snippet}
                         </SidebarItem>
                     {/if}
                     <SidebarItem label="Sign Up" on:click={login}>
-                        <svelte:fragment slot="icon">
-                            <EditOutline class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
-                        </svelte:fragment>
+                        {#snippet icon()}
+                                            
+                                <EditOutline class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+                            
+                                            {/snippet}
                     </SidebarItem>
                 </SidebarGroup>
             </SidebarWrapper>
         </Sidebar>
     </aside>
     <main class="content">
-        <slot></slot>
+        {@render children?.()}
         {#if !authenticatedToApi}
             <Button on:click={login}>Log in</Button>
         {/if}

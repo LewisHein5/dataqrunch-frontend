@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { run } from 'svelte/legacy';
+
     import {Breadcrumb, BreadcrumbItem, Toolbar, ToolbarButton, Tooltip,} from "flowbite-svelte";
     import {ChevronDoubleRightOutline, GridPlusOutline, HomeOutline} from "flowbite-svelte-icons";
 
@@ -13,23 +15,41 @@
     import LoadingComponent from "../../../components/LoadingComponent.svelte";
 
     defineCustomElements();
-    /** @type {import('./$types').PageData} */
     
-    export let data: {dataset_id: string};
-    let dataset_data: Promise<{ dataset: Dataset, rows: DatasetRow[], types: string[] }>;
-    $: dataset_data;
-    let spec: DatasetSpec;
-    $: spec;
-    let columns: {prop: string,  name: string}[];
-    $: columns;
-    let datasetRowObjects: any[];
-    $: datasetRowObjects;
-    $: focusedCell = {col: -1, row: -1};
-    let source: any[];
-    $: source;
+    
+    interface Props {
+        /** @type {import('./$types').PageData} */
+        data: {dataset_id: string};
+    }
+
+    let { data }: Props = $props();
+    let dataset_data: Promise<{ dataset: Dataset, rows: DatasetRow[], types: string[] }> = $state();
+    run(() => {
+        dataset_data;
+    });
+    let spec: DatasetSpec = $state();
+    run(() => {
+        spec;
+    });
+    let columns: {prop: string,  name: string}[] = $state();
+    run(() => {
+        columns;
+    });
+    let datasetRowObjects: any[] = $state();
+    run(() => {
+        datasetRowObjects;
+    });
+    let focusedCell;
+    run(() => {
+        focusedCell = {col: -1, row: -1};
+    });
+    let source: any[] = $state();
+    run(() => {
+        source;
+    });
     
     let client = new DataQrunchClient()
-    let showModal=false;
+    let showModal=$state(false);
     async function load() {
         let id = data.dataset_id;
         let client: DataQrunchClient = new DataQrunchClient()
@@ -107,21 +127,21 @@
     {:else}
         <Breadcrumb aria-label="Solid background breadcrumb example" class="bg-gray-50 py-3 px-5 dark:bg-gray-900">
             <BreadcrumbItem href="/" home>
-                <svelte:fragment slot="icon">
+                {#snippet icon()}
                     <HomeOutline class="w-4 h-4 me-2"/>
-                </svelte:fragment>
+                {/snippet}
                 Home
             </BreadcrumbItem>
             <BreadcrumbItem href="/groups">
-                <svelte:fragment slot="icon">
+                {#snippet icon()}
                     <ChevronDoubleRightOutline class="w-5 h-5 mx-2 dark:text-white"/>
-                </svelte:fragment>
+                {/snippet}
                 Datasets
             </BreadcrumbItem>
             <BreadcrumbItem>
-                <svelte:fragment slot="icon">
+                {#snippet icon()}
                     <ChevronDoubleRightOutline class="w-5 h-5 mx-2 dark:text-white" />
-                </svelte:fragment>
+                {/snippet}
                 {dataset_data.dataset.name}
             </BreadcrumbItem>
         </Breadcrumb>

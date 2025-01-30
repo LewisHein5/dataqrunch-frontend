@@ -4,9 +4,13 @@
     import ColumnDefinitionComponent from "./ColumnDefinitionComponent.svelte";
     import {GridPlusOutline} from "flowbite-svelte-icons";
 
-    export let open = false
-    let datasetName = ""
-    let columnDefinitions: ColumnDef[] = []
+   interface Props {
+      open?: boolean;
+   }
+
+   let { open = $bindable(false) }: Props = $props();
+    let datasetName = $state("")
+    let columnDefinitions: ColumnDef[] = $state([])
     let constraints: string[] = []
     
     const dispatch = createEventDispatcher();
