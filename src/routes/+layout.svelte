@@ -91,43 +91,33 @@ async function logout() {
                 <SidebarGroup>
                     <SidebarItem label="Dashboard">
                         {#snippet icon()}
-                                            
-                                <ChartPieSolid class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
-                            
-                                            {/snippet}
+                            <ChartPieSolid class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+                        {/snippet}
                     </SidebarItem>
                     {#if $authenticatedToApi}
                         <SidebarItem label="Datasets" href="/groups">
                             {#snippet icon()}
-                                                    
-                                    <FolderDuplicateSolid class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"/>
-                                
-                                                    {/snippet}
+                                <FolderDuplicateSolid class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white"/>
+                            {/snippet}
                         </SidebarItem>
                     {/if}
                     {#if !$authenticatedToApi}
                         <SidebarItem label="Sign In" on:click={login}>
                             {#snippet icon()}
-                                                    
-                                    <ArrowRightToBracketOutline class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
-                                
-                                                    {/snippet}
+                                <ArrowRightToBracketOutline class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+                            {/snippet}
                         </SidebarItem>
                     {:else }
                         <SidebarItem label="Sign Out" on:click={login}>
                             {#snippet icon()}
-                                                    
-                                    <ArrowLeftToBracketOutline class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
-                                
-                                                    {/snippet}
+                                <ArrowLeftToBracketOutline class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+                            {/snippet}
                         </SidebarItem>
                     {/if}
                     <SidebarItem label="Sign Up" on:click={login}>
                         {#snippet icon()}
-                                            
-                                <EditOutline class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
-                            
-                                            {/snippet}
+                            <EditOutline class="w-6 h-6 text-gray-500 transition duration-75 dark:text-gray-400 group-hover:text-gray-900 dark:group-hover:text-white" />
+                        {/snippet}
                     </SidebarItem>
                 </SidebarGroup>
             </SidebarWrapper>

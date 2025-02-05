@@ -60,18 +60,14 @@
     {:else}
         <BreadcrumbItem href="/" home>
             {#snippet icon()}
-                    
-                    <HomeOutline class="w-4 h-4 me-2"/>
-                
-                    {/snippet}
+                <HomeOutline class="w-4 h-4 me-2"/>
+            {/snippet}
             Home
         </BreadcrumbItem>
         <BreadcrumbItem href="/groups">
             {#snippet icon()}
-                    
-                    <ChevronDoubleRightOutline class="w-5 h-5 mx-2 dark:text-white"/>
-                
-                    {/snippet}
+                <ChevronDoubleRightOutline class="w-5 h-5 mx-2 dark:text-white"/>
+            {/snippet}
             Datasets
         </BreadcrumbItem>
         <Toolbar>
