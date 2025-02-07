@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { run } from 'svelte/legacy';
+
     import GroupComponent from "../../../components/GroupComponent.svelte";
     /** @type {import('./$types').PageData} */
     import {Breadcrumb, BreadcrumbItem, Li, List, Toolbar, ToolbarButton, Tooltip} from 'flowbite-svelte';
@@ -16,18 +18,26 @@
     import {authenticatedToApi} from "../../../store";
     import LoadingComponent from "../../../components/LoadingComponent.svelte";
 
-    export let data: {group_id: string};
+    interface Props {
+        data: {group_id: string};
+    }
 
-    let groups_data_promise: Promise<{groups: Group[], datasets: Dataset[], current_group: Group, types: string[]}>;
-    $: groups_data_promise;
+    let { data }: Props = $props();
+
+    let groups_data_promise: Promise<{groups: Group[], datasets: Dataset[], current_group: Group, types: string[]}> = $state();
+    run(() => {
+        groups_data_promise;
+    });
     authenticatedToApi.subscribe(async (authenticated)=>{
         if (authenticated){
             groups_data_promise = load()
         }
     })
 
-    $: showNewDatasetModal = false;
-    $: showNewGroupModal = false;
+    let showNewDatasetModal = $state(false);
+    
+    let showNewGroupModal = $state(false);
+    
 
     async function load() {
         let client: DataQrunchClient = new DataQrunchClient();
@@ -60,21 +70,21 @@
     {:else}
         <Breadcrumb aria-label="Solid background breadcrumb example" class="bg-gray-50 py-3 px-5 dark:bg-gray-900">
             <BreadcrumbItem href="/" home>
-                <svelte:fragment slot="icon">
+                {#snippet icon()}
                     <HomeOutline class="w-4 h-4 me-2"/>
-                </svelte:fragment>
+                {/snippet}
                 Home
             </BreadcrumbItem>
             <BreadcrumbItem href="/groups">
-                <svelte:fragment slot="icon">
+                {#snippet icon()}
                     <ChevronDoubleRightOutline class="w-5 h-5 mx-2 dark:text-white"/>
-                </svelte:fragment>
+                {/snippet}
                 Datasets
             </BreadcrumbItem>
             <BreadcrumbItem>
-                <svelte:fragment slot="icon">
+                {#snippet icon()}
                     <ChevronDoubleRightOutline class="w-5 h-5 mx-2 dark:text-white" />
-                </svelte:fragment>
+                {/snippet}
                 {groups_data.current_group.name}
             </BreadcrumbItem>
         </Breadcrumb>

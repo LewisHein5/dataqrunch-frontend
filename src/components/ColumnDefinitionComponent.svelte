@@ -1,13 +1,21 @@
 <script lang="ts">
+    import { run } from 'svelte/legacy';
+
     import {Card, FloatingLabelInput, Label, Select} from "flowbite-svelte";
     import {DataQrunchClient} from "$lib/dataQrunchClient";
     import {authenticatedToApi} from "../store";
     import LoadingComponent from "./LoadingComponent.svelte";
-    export let colName: string;
-    export let selected: number;
+    interface Props {
+        colName: string;
+        selected: number;
+    }
 
-    let dataTypesPromise: Promise<string[]>;
-    $: dataTypesPromise
+    let { colName = $bindable(), selected = $bindable() }: Props = $props();
+
+    let dataTypesPromise: Promise<string[]> = $state();
+    run(() => {
+        dataTypesPromise
+    });
 
     
     async function load(){

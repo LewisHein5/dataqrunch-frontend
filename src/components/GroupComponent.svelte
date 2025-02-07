@@ -1,8 +1,12 @@
 <script lang="ts">
     import type {Group} from "$lib/dataqrunch";
-    export let group: Group;
     import {Badge} from "flowbite-svelte";
     import {FolderOutline} from "flowbite-svelte-icons";
+    interface Props {
+        group: Group;
+    }
+
+    let { group }: Props = $props();
 </script>
 
 <a href="/groups/{group.id.id}">

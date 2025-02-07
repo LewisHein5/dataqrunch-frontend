@@ -1,7 +1,7 @@
-<script>
+<script lang="ts">
 import {FileChartBarOutline} from "flowbite-svelte-icons";
 
-export let dataset
+    let { dataset } = $props();
 </script>
 
 <a href="/datasets/{dataset.id?.id}">

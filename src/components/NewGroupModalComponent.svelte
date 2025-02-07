@@ -2,8 +2,13 @@
     import {Button, Card, FloatingLabelInput, Label, Modal} from "flowbite-svelte";
     import {createEventDispatcher} from "svelte";
 
-    export let open = false
-    $: groupName = ""
+   interface Props {
+      open?: boolean;
+   }
+
+   let { open = $bindable(false) }: Props = $props();
+    let groupName = $state("");
+   
 
     const dispatch = createEventDispatcher();
    

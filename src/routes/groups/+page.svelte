@@ -1,4 +1,6 @@
 <script lang="ts">
+    import { run } from 'svelte/legacy';
+
     import GroupComponent from "../../components/GroupComponent.svelte";
     import {BreadcrumbItem, Li, List, Toolbar, ToolbarButton, Tooltip} from 'flowbite-svelte';
     import DatasetComponent from "../../components/DatasetNameComponent.svelte";
@@ -16,12 +18,16 @@
     import LoadingComponent from "../../components/LoadingComponent.svelte";
 
     /** @type {import('./$types').PageData} */
-    let groups_data: Promise<{groups: Group[], datasets: Dataset[], types: string[]}>;
-    $: groups_data;
+    let groups_data: Promise<{groups: Group[], datasets: Dataset[], types: string[]}> = $state();
+    run(() => {
+        groups_data;
+    });
     const client = new DataQrunchClient()
 
-    $: showNewDatasetModal = false;
-    $: showNewGroupModal = false;
+    let showNewDatasetModal = $state(false);
+    
+    let showNewGroupModal = $state(false);
+    
     authenticatedToApi.subscribe((x)=>{
         if (x){
             groups_data = load()
@@ -53,15 +59,15 @@
         <LoadingComponent/>
     {:else}
         <BreadcrumbItem href="/" home>
-            <svelte:fragment slot="icon">
+            {#snippet icon()}
                 <HomeOutline class="w-4 h-4 me-2"/>
-            </svelte:fragment>
+            {/snippet}
             Home
         </BreadcrumbItem>
         <BreadcrumbItem href="/groups">
-            <svelte:fragment slot="icon">
+            {#snippet icon()}
                 <ChevronDoubleRightOutline class="w-5 h-5 mx-2 dark:text-white"/>
-            </svelte:fragment>
+            {/snippet}
             Datasets
         </BreadcrumbItem>
         <Toolbar>
