@@ -30,6 +30,9 @@ export class DataQrunchClient {
     }
     
     public async getDataset(id: string): Promise<Dataset> {
+        if (id.length != 36){
+            throw new Error("Invalid id:" + id);
+        }
         return await this.client.getDataset(this.createIdModel(id), this.call_options);
     }
     
